@@ -1,0 +1,462 @@
+%!TEX program = xelatex
+%# -*- coding: utf-8 -*-
+%!TEX encoding = UTF-8 Unicode
+
+\documentclass[12pt,oneside,a4paper]{article}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2cm,bmargin=2cm,lmargin=2cm,rmargin=2cm}
+\usepackage[pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=2,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\hypersetup{pdfstartview={XYZ null null 1}}
+\usepackage{url}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{microtype}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage[retainorgcmds]{IEEEtrantools}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}} 
+\renewcommand{\algorithmicensure}{\textbf{Output:}} 
+
+\usepackage[sc]{mathpazo}
+\linespread{1.1}
+\usepackage[T1]{fontenc}
+
+
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage[figure]{hypcap}
+\usepackage[hypcap]{caption}
+\usepackage{tikz}
+%\usepackage{grffile} 
+%\usepackage{float} 
+\usepackage{pdfpages}
+
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+
+%\usepackage[square,numbers,super,comma,sort]{natbib}
+%\usepackage[backend=biber, style=nature, sorting=none, isbn=false, url=false, doi=false]{biblatex}
+%\addbibresource{ref.bib}
+%\usepackage[]{authblk}
+
+\usepackage{verbatim}
+
+\newcommand{\problem}[1]
+{
+    \clearpage
+    \section*{Problem {#1}}
+}
+
+\newcommand{\subproblem}[1]
+{
+    \subsection*{Problem {#1}}
+}
+
+
+\newcommand{\solution}
+{
+    \vspace{15pt}
+    \noindent\ignorespaces\textbf{\large Solution}
+}
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\lhead{\hmwkAuthorName}
+\chead{\hmwkTitle}
+\rhead{\firstxmark}
+\cfoot{\thepage}
+
+\newcommand{\hmwkTitle}{STAT 8051 HW 3}
+\newcommand{\hmwkAuthorName}{Jingxiang Li}
+
+\setlength\headheight{15pt}
+\setlength\parindent{0pt}
+\setlength{\parskip}{0.5em}
+
+\newcommand{\m}[1]{\texttt{{#1}}}
+
+
+\pagestyle{fancy}
+
+\title{\hmwkTitle}
+\author{\hmwkAuthorName}
+\date{\today}
+
+\begin{document}
+
+
+\maketitle
+
+<<setup, include=FALSE, cache=FALSE>>=
+# set global chunk options
+opts_chunk$set(fig.path='figure/', fig.align='center', fig.show='hold', tidy.opts=list(keep.blank.line=FALSE, width.cutoff=60), warning=FALSE, error=FALSE, message=FALSE, echo=TRUE)
+#, sanitize=TRUE, dev="tikz")
+options(replace.assign=TRUE,width=90)
+knit_theme$set("edit-eclipse")
+knit_hooks$set(document = function(x) { 
+  sub('\\usepackage[]{color}', '\\usepackage[]{xcolor}', x, fixed = TRUE) 
+}) 
+@
+
+\problem{6.7}
+(Data file: \m{fuel2001}) With the fuel consumption data, consider the following two models in Wilkinson–Rogers notation:\\
+
+\m{fuel $\sim$ Tax + Dlic + Income + log(Miles)} \hspace{50pt}     (6.22)\\
+\m{fuel $\sim$ log(Miles) + Income + Dlic + Tax} \hspace{50pt}     (6.23)\\
+
+These models are of course the same, as they only differ by the order in which the regressors are written.
+
+\subproblem{6.7.1}
+Show that the Type I anova for (6.22) and (6.23) are different. Provide an interpretation of each of the tests.
+
+\solution
+<<p671>>=
+require(alr4)
+
+data <- fuel2001
+data$Dlic <- data$Drivers / data$Pop
+data$Fuel <- 1000 * data$FuelC / data$Pop
+
+m1 <- lm(Fuel ~ Tax + Dlic + Income + log(Miles), data = data)
+m2 <- lm(Fuel ~ log(Miles) + Income + Dlic + Tax, data = data)
+anova(m1)
+anova(m2)
+@
+
+The above anova results are based on Type I anova. Note that all the main effects of predictors are significant in two models, however, the levels of significance are different in two models. suggesting that the order of predictors influence the result of Type I anova.
+
+\subproblem{6.7.2}
+Show that the Type II anova is the same for the two models. Which of the Type II tests are equivalent to Type I tests?
+
+\solution
+<<p672>>=
+Anova(mod = m1, type = 2)
+Anova(mod = m2, type = 2)
+@
+
+Notice that the Type II anova is the same for the two models.
+
+In the first model, the Type II test of \m{log(Miles)} is equal to Type I; in the second model, the Type II test of \m{Tax} is equal to the Type I test.
+
+\problem{6.8}
+Show that the overall F-test for multiple regression with an intercept can be written as
+$$F = (\frac{n - p'}{p})\frac{R^{2}}{1-R^{2}}$$
+Where $R^{2}$ is the proportion of variability explained by the regression. Thus, the F-statistic is just a transformation of $R^{2}$.
+
+\solution
+
+Following the definition of $R^{2}$ and $F$ statistic, we have
+$$R^{2} = 1 - \frac{RSS}{SYY}$$
+$$F = \frac{(SYY-RSS)/p}{RSS/(n - p - 1)}$$
+Then 
+$$\begin{aligned}
+F & =\frac{SYY - RSS}{RSS} \cdot \frac{n - p - 1}{p}\\
+& = \frac{1 - \frac{RSS}{SYY}}{\frac{RSS}{SYY}} \cdot \frac{n - p - 1}{p}\\
+& = \frac{R^{2}}{1 - R^{2}} \cdot \frac{n - p - 1}{p}
+\end{aligned}$$
+Q.E.D.
+
+\problem{6.9}
+(Data file: \m{Cakes}) For the cakes data in Section 5.3.1, we fit the full second-order model,
+$$E(Y|X_{1} = x_{1},X_{2} = x_{2}) = \beta_{0} + \beta_{1}x_{1} + \beta_{2}x_{1}^2 + \beta_{3}x_{2} + \beta_{4}x_{2}^{2} + \beta_{5}x_{1}x_{2}$$
+Compute and summarize the following three hypothesis tests.
+
+\begin{center}
+NH: $\beta_{5} = 0$ vs. AH: $\beta_{5} \neq 0$
+
+NH: $\beta_{2} = 0$ vs. AH: $\beta_{2} \neq 0$
+
+NH: $\beta_{1} = \beta_{2} = \beta_{5} = 0$ vs. AH: Not all 0
+\end{center}
+
+\solution
+
+<<p69>>=
+data <- cakes
+m_full <- lm(Y ~ (X1 + X2) ^ 2 + I(X1 ^ 2) + I(X2 ^ 2), data = data)
+summary(m_full)
+@
+
+First Let's deal with the first two tests. Note that both of them are one coefficient two-sided t-test. Using R, it's easy to see the t-test result in the summary of full regression model. 
+
+As the result, for the first hypothesis test, we see a tiny p-value of 0.0047, suggesting that we should reject the null hypothesis, $\beta_{5}$ should be non-zero.
+
+Similarly, for the second test, we see a p-value of 0.0041, suggesting that $\beta_{2}$ should be non-zero, the null hypothesis should be rejected.
+
+<<p691>>=
+m_test <- lm(Y ~ X2 + I(X2 ^ 2), data = data)
+anova(m_test, m_full)
+@
+
+Then we use anova to solve the last hypothesis test. the result shows a very tiny p-value, suggesting that the null hypothesis should be rejected, $\beta_{1}$, $\beta_{2}$ and $\beta_{5}$ are not all zero. 
+
+\problem{6.14}
+\textbf{Testing for lack-of-fit} (Data file: \m{MinnLand}) Refer to the Minnesota farm sales data introduced in Problem 5.4.
+
+\subproblem{6.14.1}
+Fit the regression model \m{log(acrePrice) $\sim$ year} via ols, where \m{year} is not a factor, but treated as a continuous predictor. What does this model say about the change in price per acre over time? Call this model A.
+
+\solution
+<<p6141>>=
+data <- MinnLand
+m_A <- lm(log(acrePrice) ~ year, data = data)
+coef(m_A)
+@
+
+model A says the \m{log(acrePrice)} increase 0.1005 per year on average.
+
+\subproblem{6.14.2}
+
+Fit the regression model via \m{log(acrePrice) $\sim$ 1  + fyear} via ols, where \m{fyear} is a factor with as many levels are there are years in the data, including the intercept in the model. What does this model say about the change in price per acre over time? Call this model B. (Hint: \m{fyear} is not included in the data file. You need to create it from the variable \m{year}.)
+
+\solution
+<<p6142>>=
+data$fyear <- factor(data$year)
+m_B <- lm(log(acrePrice) ~ fyear, data = data)
+coef(m_B)
+@
+
+In this model the intercept is the mean value of \m{log(acrePrice)} in 2002, and each coefficient of any other years represents the change of \m{log(acrePrice)} compared with that of 2002.
+
+\subproblem{6.14.3}
+Show that model A is a special case of model B, and so a hypothesis test of NH : model A versus AH : model B is reasonable.
+
+\solution
+<<p6143, fig.width=6, fig.height=6 , out.width='.8\\linewidth'>>=
+mean_value <- tapply(X = log(data$acrePrice), INDEX = data$year, FUN = mean)
+plot(x = data$year, y = log(data$acrePrice), col = "#A4A4A4",
+     xlab = "year", ylab = "log(acrePrice)", main = "Model A VS. Model B")
+lines(x = 2002:2011, y = mean_value, type = 'b', pch = 18, cex = 2, lwd = 2, lty = 2)
+abline(coef(m_A), lwd = 2, lty = 1)
+legend("topright", c("Model A", "Model B"), lty = c(1,2), lwd = c(2,2), bg = "white")
+@
+
+We show two fitted regression model in the graph above. Note that model B (dashed line in the graph above) can be viewed as a bunch of broken lines connected with each other on the mean value of response for each year; and model A (solid line in the graph above) can be viewed as a non-broken line go through all the points. Thus model A is just the special case of model B, if the mean values of response in each year are all on an unbroken line.
+
+\subproblem{6.14.4}
+A question of interest is whether or not model A provides an adequate description of the change in \m{log(acrePrice)} over time. The hypothesis test of NH : model A versus AH : model B addresses this question, and it can be called a \emph{lack-of-fit} test for model A. Perform the test and summarize results.
+
+\solution
+
+It's easy to find that $df_{A} = \Sexpr{m_A$df}$, $df_{B} = \Sexpr{m_B$df}$, $RSS_{A} = \Sexpr{sum(m_A$residuals ^ 2)}$, $RSS_{B} = \Sexpr{sum(m_B$residuals ^ 2)}$. Hence we can construct a F-statistic:
+$$F = \frac{(RSS_{A} - RSS_{B}) / (df_{A} - df_{B})}{RSS_{B} / df_{B}} \sim~~F(df_{A} - df_{B}, df_{B})$$
+So that we can use anova to do the \emph{lack-of-fit} test.
+<<p6144>>=
+anova(m_A, m_B)
+@
+Note that the p-value is very small, seems suggesting that we should reject NH, which means model A is lack of fit. However, the small p-value may result not from the model, but the huge sample size. Note that the sample size in this problem is 18700, and hence the power of this F-test is so big that even small differences in $RSS$ will result in large significance. In addition, from the graph we can see that, this two models are very close to each other. Therefore in this problem, though the F-test suggests very tiny p-value, it's very risky to reject the NH.
+
+\problem{8.2}
+(Data file: \m{stopping}) We reconsider the stopping distance data used in Problem 7.6.
+
+\subproblem{8.2.1}
+Using \m{Speed} as the only regressor, find an appropriate transformation for \m{Distance} that can linearize this regression.
+
+\solution
+<<p821, fig.width=8, fig.height=4 , out.width='.9\\linewidth'>>=
+require(package = "gridExtra")
+require(package = "ggplot2")
+data <- stopping
+
+p1 <- ggplot(data, aes(x = Speed, y = Distance))
+p1 <- p1 + geom_point()
+p1 <- p1 + geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
+p1 <- p1 + theme_bw() + theme(text = element_text(size = 14))
+p1 <- p1 + ggtitle("(a) Before Transformation")
+
+p2 <- ggplot(data, aes(x = Speed, y = sqrt(Distance)))
+p2 <- p2 + geom_point()
+p2 <- p2 + geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
+p2 <- p2 + theme_bw() + theme(text = element_text(size = 14))
+p2 <- p2 + ggtitle("(b) After Transformation")
+
+grid.arrange(p1, p2, ncol=2)
+@
+
+We first draw the Scatterplot of \m{Distance} against \m{Speed}, as graph (a) above, and see that the relationship between response and predictor is approximately quadratic. Then let $\sqrt{\m{Speed}}$ as the new response and draw a new scatterplot (b), we see that the relationship between new response and predictor is almost linear. Thus the transformation we need should be square root.
+
+\subproblem{8.2.2}
+Using \m{Distance} as the response, transform the predictor \m{Speed} using a power transformation with each $\lambda \in \{-1,0,1\}$ and show that none of these transformations is adequate.
+
+\solution
+<<p822, fig.width=8, fig.height=8 , out.width='.9\\linewidth'>>=
+p1 <- ggplot(data, aes(x = Speed, y = Distance))
+p1 <- p1 + geom_point()
+p1 <- p1 + geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
+p1 <- p1 + theme_bw() + theme(text = element_text(size = 14))
+p1 <- p1 + ggtitle("(a) Before Transformation")
+
+p2 <- ggplot(data, aes(x = Speed - 1, y = Distance))
+p2 <- p2 + geom_point()
+p2 <- p2 + geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
+p2 <- p2 + theme_bw() + theme(text = element_text(size = 14))
+p2 <- p2 + ggtitle("(b) lambda = 1")
+
+p3 <- ggplot(data, aes(x = log(Speed), y = Distance))
+p3 <- p3 + geom_point()
+p3 <- p3 + geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
+p3 <- p3 + theme_bw() + theme(text = element_text(size = 14))
+p3 <- p3 + ggtitle("(c) lambda = 0")
+
+p4 <- ggplot(data, aes(x = -(Speed ^ (-1) - 1), y = Distance))
+p4 <- p4 + geom_point()
+p4 <- p4 + geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
+p4 <- p4 + theme_bw() + theme(text = element_text(size = 14))
+p4 <- p4 + ggtitle("(d) lambda = -1")
+
+grid.arrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
+@
+
+graph (b), (c), (d) above are scatterplots where the predictor for each graph is respectively transformed with power $\lambda \in \{-1,0,1\}$. We can see that none of the above scatterplots can be well fitted by a linear model, suggesting that none of these transformations is adequate.
+
+\subproblem{8.2.3}
+Show that using $\lambda = 2$ does match the data well. This suggests using a quadratic polynomial for regressors, including both \m{Speed} and $\m{Speed}^2$.
+
+\solution
+<<p823, fig.width=6, fig.height=4 , out.width='.8\\linewidth'>>=
+p1 <- ggplot(data, aes(x = (Speed ^ 2 - 1)/2, y = Distance))
+p1 <- p1 + geom_point()
+p1 <- p1 + geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
+p1 <- p1 + theme_bw() + theme(text = element_text(size = 12))
+p1 <- p1 + ggtitle("lambda = 2")
+p1
+@
+
+The graph above is the scatterplot of \m{Distance} against \m{Speed}, where \m{Speed} is transformed with $\lambda = 2$. It shows that under such transformation, the points can be fitted well by a linear model.
+
+\subproblem{8.2.4}
+Hald (1960) suggested on the basis of a theoretical argument using a quadratic mean function for \m{Distance} given \m{Speed}, with $\mathrm{Var}(\m{Distance}|\m{Speed})=\sigma^{2}\m{Speed}^2$. Draw the plot of \m{Distance} versus \m{Speed}, and add a line on the plot of the fitted curve from Hald’s model. Then obtain the fitted values from the fit of the transformed \m{Distance} on \m{Speed}, using the transformation you found in Problem 8.2.1. Transform these fitted values to the \m{Distance} scale (for example, if you fit the regression \m{sqrt(Distance)} $\sim$ \m{Speed}, then the fitted values would be in square-root scale and
+you would square them to get the original \m{Distance} scale). Add to your plot the line corresponding to these transformed fitted values. Compare the fit of the two models.
+
+\solution
+<<p824, fig.width=8, fig.height=6 , out.width='.8\\linewidth'>>=
+require(reshape2)
+data <- stopping
+m_h <- lm(Distance ~ I(Speed^2), data = data, weights = Speed^2)
+m_1 <- lm(sqrt(Distance) ~ Speed, data = data)
+
+x = 0:45
+y_h = x^2 * coef(m_h)[2] + coef(m_h)[1]
+y_1 = (x * coef(m_1)[2] + coef(m_1)[1])^2
+
+data_plot <- data.frame(x, y_Hald = y_h, y_P1 = y_1)
+data_plot <- melt(data_plot, id.vars = 1)
+colnames(data_plot)[2] <- "group"
+
+p <- ggplot()
+p <- p + geom_point(aes(x = data$Speed, y = data$Distance))
+p <- p + geom_line(aes(x = data_plot$x, y = data_plot$value, 
+                       linetype = data_plot$group))
+p <- p + theme_bw() + theme(text = element_text(size = 16))
+p <- p + ggtitle("Distance VS. Speed") + xlab("Speed") + ylab("Distance")
+p <- p + scale_linetype_discrete(name  ="Model",
+                              breaks=c("y_Hald", "y_P1"),
+                              labels=c("Hald Model", "Problem 8.2.1"))
+p
+@
+
+In this problem we fit Hold's model with weighted parameter $\m{Speed}^2$, and then draw the Hold's model and model fitted in problem 8.2.1 in the same graph above. We see that, according to the graph above, these two models are almost the same. The only difference is that Hold's model is better in fitting points where predictor value is high, and model in problem 8.2.1 is better in fitting points where predictor value is low.
+
+\problem{9.11}
+(Data file: \m{fuel2001}) In the fuel consumption data, consider fitting the mean function
+$$E(\m{Fuel}|X) = \beta_{0} + \beta_{1}\m{Tax} + \beta_{2}\m{Dlic} + \beta_{3}\m{Income} + \beta_{4}\m{log(Miles)}$$
+For this regression, we find $\hat{\sigma} = 64.891$ with 46 $df$, and the diagnostic statistics for four states and the District of Columbia were the following:
+
+\begin{table}[ht!]
+\centering
+%\caption*{Problem 9.11}
+\begin{tabular}{lrrr}
+\toprule
+ \multicolumn{1}{c}{  } & \multicolumn{1}{c}{ \m{Fuel} } & \multicolumn{1}{c}{ $\hat{e}_{i}$ } & \multicolumn{1}{c}{ $h_{ii}$ } \\
+\midrule
+ Alaska & $514.279$ & $-163.145$ & $0.256$ \\
+ New York & $374.164$ & $-137.599$ & $0.162$ \\
+ Hawaii & $426.349$ & $-102.409$ & $0.206$ \\
+ Wyoming & $842.792$ & $183.499$ & $0.084$ \\
+ District of Columbia & $317.492$ & $-49.452$ & $0.415$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Compute $D_{i}$ and $t_{i}$ for each of these cases, and test for one outlier. Which is most influential?
+
+\solution
+<<p911>>=
+data <- fuel2001
+data$Dlic <- data$Drivers / data$Pop
+data$Fuel <- 1000 * data$FuelC / data$Pop
+
+test_outlier <- function(data, index)
+{
+    m_tmp <- lm(Fuel ~ Tax + Dlic + Income + log(Miles), data = data,
+                x = TRUE, y = TRUE)
+    X = m_tmp$x
+    y = m_tmp$y
+    
+    m <- lm(Fuel ~ Tax + Dlic + Income + log(Miles), data = data, subset = -index)
+    y_predict <- predict(object = m, newdata = data[index, ])
+    
+    sigma <- sqrt(sum(m$residuals^2) / m$df.residual)
+    t = (y[index] - y_predict) / 
+        (sigma * sqrt(1 + t(X[index, ]) %*% solve(t(X[-index, ]) 
+                                %*% X[-index, ]) %*% X[index, ]))
+    p_value = (1 - pt(abs(t), df = m$df.residual)) * 2
+    data.frame(t, p_value)
+}
+
+test_influence <- function(data, index)
+{
+    m_full <- lm(Fuel ~ Tax + Dlic + Income + log(Miles), data = data)
+    m_noindex <- lm(Fuel ~ Tax + Dlic + Income + log(Miles), 
+                    data = data, subset = -index)
+    
+    y_predict_full <- predict(object = m_full, newdata = data)
+    y_predict_noindex <- predict(object = m_noindex, newdata = data)
+    
+    sigma_2 <- sum(m_full$residuals^2) / m_full$df.residual
+    
+    D <- t(y_predict_full - y_predict_noindex) %*% 
+        (y_predict_full - y_predict_noindex) / 
+        (length(coef(m_full)) * sigma_2)
+        
+    data.frame(D)
+}
+
+result <- rbind(test_outlier(data, match("AK", rownames(data))),
+test_outlier(data, match("NY", rownames(data))),
+test_outlier(data, match("HI", rownames(data))),
+test_outlier(data, match("WY", rownames(data))),
+test_outlier(data, match("DC", rownames(data))))
+
+result <- cbind(result, rbind(test_influence(data, match("AK", rownames(data))),
+test_influence(data, match("NY", rownames(data))),
+test_influence(data, match("HI", rownames(data))),
+test_influence(data, match("WY", rownames(data))),
+test_influence(data, match("DC", rownames(data)))))
+
+rownames(result) <- c("AK", "NY", "HI", "WY", "DC")
+result
+@
+
+Here we define two functions \m{test\_outlier} and \m{test\_influence} to get the $D_{i}$, $t_{i}$ and the p-value derived from $t_{i}$. The p-values derived from the outlier test suggest that points representing Alaska, New York and Wyoming are outliers. The most influential point is Alaska.
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
