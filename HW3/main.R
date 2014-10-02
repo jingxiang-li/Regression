@@ -132,7 +132,7 @@ p
 
 
 # 9.11 --------------------------------------------------------------------
-
+require(alr4)
 data <- fuel2001
 data$Dlic <- data$Drivers / data$Pop
 data$Fuel <- 1000 * data$FuelC / data$Pop
@@ -149,7 +149,7 @@ test_outlier <- function(data, index)
     sigma <- sqrt(sum(m$residuals^2) / m$df.residual)
     t = (y[index] - y_predict) / 
         (sigma * sqrt(1 + t(X[index, ]) %*% solve(t(X[-index, ]) %*% X[-index, ]) %*% X[index, ]))
-    p_value = (1 - pt(abs(t), df = m$df.residual)) * 2
+    p_value = (1 - pt(abs(t), df = m$df.residual)) * 2 * nrow(data)
     data.frame(t, p_value)
 
 }
@@ -173,6 +173,8 @@ test_influence <- function(data, index)
 test_outlier(data, match("HI", rownames(data)))
 test_influence(data, match("HI", rownames(data)))
 
+rstudent(lm(Fuel ~ Tax + Dlic + Income + log(Miles), data = data))["AL"]
+cooks.distance(lm(Fuel ~ Tax + Dlic + Income + log(Miles), data = data))
 
 
 

@@ -251,7 +251,8 @@ So that we can use anova to do the \emph{lack-of-fit} test.
 <<p6144>>=
 anova(m_A, m_B)
 @
-Note that the p-value is very small, seems suggesting that we should reject NH, which means model A is lack of fit. However, the small p-value may result not from the model, but the huge sample size. Note that the sample size in this problem is 18700, and hence the power of this F-test is so big that even small differences in $RSS$ will result in large significance. In addition, from the graph we can see that, this two models are very close to each other. Therefore in this problem, though the F-test suggests very tiny p-value, it's very risky to reject the NH.
+Note that the p-value is very small, seems suggesting that we should reject NH, which means model A is lack of fit. \par
+However, the small p-value may result not from the model, but the huge sample size. Note that the sample size in this problem is 18700, and hence the power of this F-test is so big that even small differences in $RSS$ will result in large significance. In addition, from the graph we can see that, this two models are very close to each other. Therefore in this problem, though the F-test suggests statistical significance, it can't be translated to practical significance.
 
 \problem{8.2}
 (Data file: \m{stopping}) We reconsider the stopping distance data used in Problem 7.6.
@@ -407,7 +408,8 @@ test_outlier <- function(data, index)
     t = (y[index] - y_predict) / 
         (sigma * sqrt(1 + t(X[index, ]) %*% solve(t(X[-index, ]) 
                                 %*% X[-index, ]) %*% X[index, ]))
-    p_value = (1 - pt(abs(t), df = m$df.residual)) * 2
+    ## Need Notice, we test 5 states, so the df = 51 - 5, and then we use Bonferroni p-value
+    p_value = min((1 - pt(abs(t), df = 46)) * 2 * 51, 1)
     data.frame(t, p_value)
 }
 
@@ -445,7 +447,7 @@ rownames(result) <- c("AK", "NY", "HI", "WY", "DC")
 result
 @
 
-Here we define two functions \m{test\_outlier} and \m{test\_influence} to get the $D_{i}$, $t_{i}$ and the p-value derived from $t_{i}$. The p-values derived from the outlier test suggest that points representing Alaska, New York and Wyoming are outliers. The most influential point is Alaska.
+Here we define two functions \m{test\_outlier} and \m{test\_influence} to get the $D_{i}$, $t_{i}$ and the p-value derived from $t_{i}$. The p-values derived from the outlier test suggest that there is no evidence to say that any of these states is outlier. The most influential point is Alaska.
 
 
 

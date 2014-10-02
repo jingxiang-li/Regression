@@ -442,7 +442,8 @@ So that we can use anova to do the \emph{lack-of-fit} test.
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
-Note that the p-value is very small, seems suggesting that we should reject NH, which means model A is lack of fit. However, the small p-value may result not from the model, but the huge sample size. Note that the sample size in this problem is 18700, and hence the power of this F-test is so big that even small differences in $RSS$ will result in large significance. In addition, from the graph we can see that, this two models are very close to each other. Therefore in this problem, though the F-test suggests very tiny p-value, it's very risky to reject the NH.
+Note that the p-value is very small, seems suggesting that we should reject NH, which means model A is lack of fit. \par
+However, the small p-value may result not from the model, but the huge sample size. Note that the sample size in this problem is 18700, and hence the power of this F-test is so big that even small differences in $RSS$ will result in large significance. In addition, from the graph we can see that, this two models are very close to each other. Therefore in this problem, though the F-test suggests statistical significance, it can't be translated to practical significance.
 
 \problem{8.2}
 (Data file: \m{stopping}) We reconsider the stopping distance data used in Problem 7.6.
@@ -644,7 +645,8 @@ Compute $D_{i}$ and $t_{i}$ for each of these cases, and test for one outlier. W
     \hlstd{t} \hlkwb{=} \hlstd{(y[index]} \hlopt{-} \hlstd{y_predict)} \hlopt{/}
         \hlstd{(sigma} \hlopt{*} \hlkwd{sqrt}\hlstd{(}\hlnum{1} \hlopt{+} \hlkwd{t}\hlstd{(X[index, ])} \hlopt{%*%} \hlkwd{solve}\hlstd{(}\hlkwd{t}\hlstd{(X[}\hlopt{-}\hlstd{index, ])}
                                 \hlopt{%*%} \hlstd{X[}\hlopt{-}\hlstd{index, ])} \hlopt{%*%} \hlstd{X[index, ]))}
-    \hlstd{p_value} \hlkwb{=} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{pt}\hlstd{(}\hlkwd{abs}\hlstd{(t),} \hlkwc{df} \hlstd{= m}\hlopt{$}\hlstd{df.residual))} \hlopt{*} \hlnum{2}
+    \hlcom{## Need Notice, we test 5 states, so the df = 51 - 5, and then we use Bonferroni p-value}
+    \hlstd{p_value} \hlkwb{=} \hlkwd{min}\hlstd{((}\hlnum{1} \hlopt{-} \hlkwd{pt}\hlstd{(}\hlkwd{abs}\hlstd{(t),} \hlkwc{df} \hlstd{=} \hlnum{46}\hlstd{))} \hlopt{*} \hlnum{2} \hlopt{*} \hlnum{51}\hlstd{,} \hlnum{1}\hlstd{)}
     \hlkwd{data.frame}\hlstd{(t, p_value)}
 \hlstd{\}}
 
@@ -682,17 +684,17 @@ Compute $D_{i}$ and $t_{i}$ for each of these cases, and test for one outlier. W
 \hlstd{result}
 \end{alltt}
 \begin{verbatim}
-##          t  p_value      D
-## AK -3.1930 0.002570 0.5850
-## NY -2.4382 0.018771 0.2081
-## HI -1.8144 0.076291 0.1624
-## WY  3.2461 0.002212 0.1596
-## DC -0.9962 0.324475 0.1408
+##          t p_value      D
+## AK -3.1930  0.1296 0.5850
+## NY -2.4382  0.9527 0.2081
+## HI -1.8144  1.0000 0.1624
+## WY  3.2461  0.1115 0.1596
+## DC -0.9962  1.0000 0.1408
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
 
-Here we define two functions \m{test\_outlier} and \m{test\_influence} to get the $D_{i}$, $t_{i}$ and the p-value derived from $t_{i}$. The p-values derived from the outlier test suggest that points representing Alaska, New York and Wyoming are outliers. The most influential point is Alaska.
+Here we define two functions \m{test\_outlier} and \m{test\_influence} to get the $D_{i}$, $t_{i}$ and the p-value derived from $t_{i}$. The p-values derived from the outlier test suggest that there is no evidence to say that any of these states is outlier. The most influential point is Alaska.
 
 
 
