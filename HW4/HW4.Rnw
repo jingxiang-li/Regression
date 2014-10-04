@@ -1,0 +1,344 @@
+%!TEX program = xelatex
+%# -*- coding: utf-8 -*-
+%!TEX encoding = UTF-8 Unicode
+
+\documentclass[12pt,oneside,a4paper]{article}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2cm,bmargin=2cm,lmargin=2cm,rmargin=2cm}
+\usepackage[pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=2,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\hypersetup{pdfstartview={XYZ null null 1}}
+\usepackage{url}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{microtype}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage[retainorgcmds]{IEEEtrantools}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}} 
+\renewcommand{\algorithmicensure}{\textbf{Output:}} 
+
+\usepackage[sc]{mathpazo}
+\linespread{1.1}
+\usepackage[T1]{fontenc}
+
+
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage[figure]{hypcap}
+\usepackage[hypcap]{caption}
+\usepackage{tikz}
+%\usepackage{grffile} 
+%\usepackage{float} 
+\usepackage{pdfpages}
+
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+
+%\usepackage[square,numbers,super,comma,sort]{natbib}
+%\usepackage[backend=biber, style=nature, sorting=none, isbn=false, url=false, doi=false]{biblatex}
+%\addbibresource{ref.bib}
+%\usepackage[]{authblk}
+
+\usepackage{verbatim}
+
+\newcommand{\problem}[1]
+{
+    \clearpage
+    \section*{Problem {#1}}
+}
+
+\newcommand{\subproblem}[1]
+{
+    \subsection*{Problem {#1}}
+}
+
+
+\newcommand{\solution}
+{
+    \vspace{15pt}
+    \noindent\ignorespaces\textbf{\large Solution}\par
+}
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\lhead{\hmwkAuthorName}
+\chead{\hmwkTitle}
+\rhead{\firstxmark}
+\cfoot{\thepage}
+
+\newcommand{\hmwkTitle}{STAT 8051 HW 4}
+\newcommand{\hmwkAuthorName}{Jingxiang Li}
+
+\setlength\headheight{15pt}
+\setlength\parindent{0pt}
+\setlength{\parskip}{0.5em}
+
+\newcommand{\m}[1]{\texttt{{#1}}}
+
+
+\pagestyle{fancy}
+
+\title{\hmwkTitle}
+\author{\hmwkAuthorName}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+<<setup, include=FALSE, cache=FALSE>>=
+# set global chunk options
+opts_chunk$set(fig.path='figure/', fig.align='center', fig.show='hold', tidy=FALSE, tidy.opts=list(keep.blank.line=TRUE, width.cutoff=60, comment=FALSE), warning=FALSE, error=FALSE, message=FALSE, echo=TRUE)
+#, sanitize=TRUE, dev="tikz")
+options(replace.assign=TRUE,width=90)
+knit_theme$set("edit-eclipse")
+knit_hooks$set(document = function(x) { 
+  sub('\\usepackage[]{color}', '\\usepackage[]{xcolor}', x, fixed = TRUE) 
+}) 
+@
+
+\problem{7.8}
+Sue fits a wls regression with all weights equal to 2. Joe fits a wls regression to the same data with all weights equal to 1. What are the differences in estimates of coefficients, standard errors, $\sigma^{2}$ F-tests between Sue’s and Joe’s analyses?
+
+\solution
+Let \m{m1} be the regression model fitted by Sue with weights all equal to 2; \m{m2} be the regression model fitted by Joe, where all weights equal to 1. Since they both use constant weights, the estimates of coefficients and the F-tests should be the same, but the standard errors and $\sigma^{2}$ are different between these two models, but it's only a scale difference.
+
+Claim that $W_{1}$ and $W_{2}$ are the weighting matrix respectively for \m{m1} and \m{m2}, so that we have $W_{1} = 2I$, $W_{2} = I$, where $I$ is the $n\times n$ identity matrix. For the coefficient estimator, we have 
+$$\hat{\beta} = (X'WX)^{-1}X'WY$$
+Let $\hat{\beta}_{1}$ be the estimator obtained from \m{m1}, $\hat{\beta}_{2}$ be the estimator obtained from \m{m2}, so that 
+$$\hat{\beta}_{1} = (X' \times 2I \times X)^{-1}X'\times 2I \times Y = (X'X)^{-1}X'Y = \hat{\beta}_{2}$$
+so that the estimates of coefficients between two models are the same.
+
+Let $e_{i}$ be the residual vectors from model \m{mi}, $RSS_{i}$ be the $RSS$ derived from model \m{mi}, $\sigma^{2}_{i}$ be the $\sigma^{2}$ from model \m{mi}, where $i = 1,2$. and let $df$ be the degree of freedom. we have
+$$RSS_{1} = e_{1}'W_{1}e_{1} = 2e_{1}'e_{1}$$
+$$RSS_{2} = e_{2}'W_{2}e_{2} = e_{1}'e_{1}$$
+Note that the estimates of coefficients between two models are the same, so that $e_{1} = e_{2}$, and $RSS_{1} = 2RSS_{2}$, and
+$$\hat{\sigma}_{1}^{2} = \frac{RSS_{1}}{df} = \frac{2RSS_{2}}{df} = 2\hat{\sigma}_{2}^{2}$$
+then we have
+$$\hat{\sigma}_{1} = \sqrt{2}\hat{\sigma}_{2}$$
+
+For $\sigma^{2}$, based on the error assumption of WLS, we have $Var(e_{1i}) = \sigma_{1}^{2} / 2$, $Var(e_{2i}) = \sigma_{2}^{2}$, and note that $e_{1i} = e_{2i}, \forall i$, so that $$\sigma_{1}^{2} = 2\sigma_{2}^{2}$$
+
+Let $F_{i}$ be the $F$ statistic for model \m{mi}, where $i=1,2$, and let $n$ be the sample size.
+$$\begin{aligned}
+F_{1} &= \frac{(\sum{2(y_{i} - \bar{y})^2} - RSS_{1}) / (n - 1 - df)}{RSS_{1}/df}\\
+F_{1} &= \frac{(\sum{2(y_{i} - \bar{y})^2} - 2RSS_{2}) / (n - 1 - df)}{2RSS_{2}/df}\\
+F_{1} &= \frac{(\sum{(y_{i} - \bar{y})^2} - RSS_{2}) / (n - 1 - df)}{RSS_{2}/df}\\
+F_{1} &= F_{2}
+\end{aligned}$$
+
+In summary, we have
+$$\hat{\beta}_{1} = \hat{\beta}_{2}$$
+$$\hat{\sigma}_{1} = \sqrt{2}\hat{\sigma}_{2}$$
+$$\sigma_{1}^{2} = 2\sigma_{2}^{2}$$
+$$F_{1} = F_{2}$$
+Q.E.D.
+
+\problem{7.7}
+\textbf{Galton’s sweet peas} (Data file: \m{galtonpeas}) Many of the ideas of regression first appeared in the work of Sir Francis Galton (1822–1911) on the inheritance of characteristics from one generation to the next. In Galton (1877), he discussed experiments on sweet peas. By comparing the sweet peas produced by parent plants to those produced by offspring plants, he could observe inheritance from one generation to the next. Galton categorized parent plants according to the typical diameter of the peas they produced. For seven size classes from 0.15 to 0.21 inches, he arranged for each of nine of his friends to grow 10 plants from seed in each size class; however, two of the crops were total failures. A summary of Galton’s data were later published in Pearson (1930). The data file includes \m{Parent} diameter, \m{Progeny} diameter, and \m{SD} the standard deviation of the progeny diameters. Sample sizes are unknown but are probably large.
+
+\subproblem{7.7.1}
+Draw the scatterplot of \m{Progeny} versus \m{Parent}.
+
+\solution
+<<p771, fig.width=6, fig.height=4 , out.width='.8\\linewidth'>>=
+require(alr4)
+require(ggplot2)
+data <- galtonpeas
+p <- ggplot(data = data, aes(x = Parent, y = Progeny))
+p <- p + geom_point()
+p <- p + theme_bw() + theme(text = element_text(size = 12))
+p <- p + ggtitle("Progeny VS Parent")
+p
+@
+
+\subproblem{7.7.2}
+Assuming that the standard deviations given are population values, compute the weighted regression of \m{Progeny} on \m{Parent}. Draw the fitted mean function on your scatterplot.
+
+\solution
+<<p772, fig.width=6, fig.height=4 , out.width='.8\\linewidth'>>=
+model <- lm(Progeny ~ Parent, data = data, weights = 1 / data$SD^2)
+coef <- model$coefficients
+
+p <- p + geom_abline(intercept = coef[1], slope = coef[2])
+p
+@
+
+\subproblem{7.7.3}
+Galton took the average size of all peas produced by a plant to determine the size class of the parental plant. Yet for seeds to represent that plant and produce offspring, Galton chose seeds that were as close to the overall average size as possible. Thus, for a small plant, the exceptional large seed was chosen as a representative, while larger, more robust plants were represented by relatively smaller seeds. What effects would you expect these experimental biases to have on (1) estimation of the intercept and slope and (2) estimates of error?
+
+\solution
+Following the way Galton determine the seeds that represent the parent plant, the estimation of the slope will be lower than the true nature, and thus the intercept term will increase, and the variance will increase too. 
+
+Due to the fact that larger seeds are chosen for small plant, smaller seeds are chosen for large plant, the offspring's size will be centralized. It means that for each level of \m{Parent}, \m{Progeny} are more closer to each other compared with the true nature, so that the slope coefficient will decrease. Then, since the central point for this regression model won't change too much and the slope will decrease, the intercept will increase. Then for the variance of model, since Galton choose exceptional large or small seeds to represent parent plant, the variance of \m{Progeny}'s size for each level of \m{Parent} will definitely increase. 
+
+\problem{7.8}
+\textbf{Jevons’s gold coins} (Data file: \m{jevons}) The data in this example are deduced from a diagram in Jevons (1868) and provided by Stephen M. Stigler. In a study of coinage, Jevons weighed 274 gold sovereigns that he had collected from circulation in Manchester, England. For each coin, he recorded the weight after cleaning to the nearest 0.001 g, and the date of issue. The data file includes \m{Age}, the age of the coin in decades, \m{n}, the number of coins in the age class, \m{Weight}, the average weight of the coins in the age class, \m{SD}, the standard deviation of the weights. The minimum \m{Min} and maximum \m{Max} of the weights are also given. The standard weight of a gold sovereign was 7.9876 g; the minimum legal weight was 7.9379 g.
+
+\subproblem{7.8.1}
+Draw a scatterplot of \m{Weight} versus \m{Age}, and comment on the applicability of the usual assumptions of the linear regression model. Also draw a scatterplot of \m{SD} versus \m{Age}, and summarize the information in this plot.
+
+\solution
+<<p781, fig.width=8, fig.height=4 , out.width='.9\\linewidth'>>=
+require(gridExtra)
+data <- jevons
+
+p1 <- ggplot(data = data, aes(x = Age, y = Weight))
+p1 <- p1 + geom_point()
+p1 <- p1 + geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
+p1 <- p1 + theme_bw() + theme(text = element_text(size = 14))
+p1 <- p1 + ggtitle("Weight VS Age")
+
+p2 <- ggplot(data = data, aes(x = Age, y = SD))
+p2 <- p2 + geom_point()
+p2 <- p2 + geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
+p2 <- p2 + theme_bw() + theme(text = element_text(size = 14))
+p2 <- p2 + ggtitle("SD VS Age")
+
+grid.arrange(p1, p2, ncol=2)
+@
+
+For the regression model \m{Weight} versus \m{Age}, following the information provided by the scatterplot, the linear form is appropriate and there is no specific information shows that the variance of each case in this dataset is different. However, as the standard deviation for each point is given, we should consider WLS as our primary choice.
+
+For the \m{SD} versus \m{Age} scatterplot, we can see that as \m{Age} goes on, the standard deviation of the weights increase linearly against \m{Age}.
+
+\subproblem{7.8.2}
+To fit a simple linear regression model with Weight as the response, wls should be used with variance function $Var(\m{Weight}|\m{Age}) =  \m{n}\sigma^{2}/\m{SD}^{2}$. Sample sizes are large enough to assume the \m{SD} are population values. Fit the wls model.
+
+\solution
+<<p782>>=
+w <- data$SD^2 / data$n
+m <- lm(Weight ~ Age, data = data, weight = w)
+summary(m)
+@
+
+\subproblem{7.8.3}
+Is the fitted regression consistent with the known standard weight for a new coin?
+
+\solution
+To obtain the average weight for a new coin, we only need refer to the intercept term.
+<<p783>>=
+coef(m)
+@
+Note that the fitted intercept is 8.0027, which is larger than the standard weight 7.9876, suggesting that it is consistent with the known standard weight for a new coin.
+
+\subproblem{7.8.4}
+For previously unsampled coins of $\m{Age} = 1, 2, 3, 4, 5$, estimate the probability that the weight of the coin is less than the legal minimum.\par
+(\emph{Hints:} The standard error of prediction is the square root of the sum of two terms, the assumed known variance of an unsampled coin of known \m{Age}, which is different for each age, and the estimated variance of the fitted value for that \m{Age}; the latter is computed from the formula for the variance of a fitted value. You should use the normal distribution rather than a $t$ to get the probabilities.)
+
+\solution
+<<p784>>=
+m_var <- vcov(m)
+m_var <- m_var[1,1] + data$Age^2 * m_var[2,2] + 2 * data$Age * m_var[1,2]
+m_sd <- sqrt(m_var + data$SD^2)
+y_hat <- predict(object = m, newdata = data.frame(Age = 1:5))
+pnorm((7.9379 - y_hat) / m_sd)
+@
+
+\subproblem{7.8.5}
+Determine the \m{Age} at which the predicted weight of coins is equal to the legal minimum, and use the delta method to get a standard error for the estimated age. This problem is called inverse regression, and is discussed by Brown (1993).
+
+\solution
+To solve this problem, we construct estimator $$g(\hat{\beta}) = \frac{7.9379 - \hat{\beta}_{0}}{\hat{\beta}_{1}}$$
+
+So that the estimated \m{Age} should be 
+$$g^{*}(\hat{\beta}) = \frac{7.9379 - 8.0027}{-0.0261} = 2.4828$$
+
+Using delta method, we can get a standard error for the estimated age.
+
+$$g(\hat{\beta})' = (-\frac{1}{\hat{\beta}_{1}}, -\frac{7.9379 - \hat{\beta}_{0}}{\hat{\beta}_{1}^{2}}) = (38.3141, 95.1249)$$
+So that
+$$Var[g(\hat{\beta})] = g(\hat{\beta})'Var(\hat{\beta})(g(\hat{\beta})')^{T}$$
+
+<<p785>>=
+grad <- as.matrix(c(38.3141, 95.1249))
+sqrt(t(grad) %*% vcov(m) %*% grad)
+@
+
+So that the standard error for the estimated age is 0.09657.
+
+\problem{7.10}
+(Data file: \m{fuel2001})
+
+\subproblem{7.10.1}
+Use the bootstrap to estimate confidence intervals for the coefficients in the fuel data, and compare the results with the usual large sample ols estimates.
+
+\solution
+<<p7101>>=
+data <- fuel2001
+data$Dlic <- data$Drivers / data$Pop
+data$Fuel <- 1000 * data$FuelC / data$Pop
+m <- lm(Fuel ~ Tax + Dlic + Income + log(Miles), data = data)
+data_ori <- data
+
+library(boot) 
+confint_bootstrap <- function(data, indices) {
+    d <- data[indices, ] # allows boot to select sample
+    data_tmp <- data_ori
+    data_tmp$Fuel <- data_tmp$Fuel + d
+    fit <- lm(Fuel ~ Tax + Dlic + Income + log(Miles), data_tmp)
+    return(coef(fit))
+} 
+set.seed(123)
+results <- boot(data = as.matrix(m$residuals), 
+                statistic = confint_bootstrap, R = 500)
+result <- results$t
+colnames(result) <- names(coef(m))
+
+## Bootstrap confidence interval
+apply(X = result, MARGIN = 2, FUN = quantile, probs = c(0.025, 0.975))
+
+## OLS confidence interval
+t(confint(m))
+@
+
+In this problem, since the linear form of model is appropriate, we apply residual bootstrap to obtain the bootstrap confidence interval of coefficients. As the result displayed in the code chunk above, we see that the bootstrap confidence interval is more or less different from the interval derived from usual OLS, especially for the coefficient of \m{Tax}.
+
+\subproblem{7.10.2}
+Examine the histograms of the bootstrap replications for each of the coefficients. Are the histograms symmetric or skewed? Do they look like normally distributed data, as they would if the large sample normal theory applied to these data? Do the histograms support or refute the differences between the bootstrap and large sample confidence intervals found in Problem 7.10.1?
+
+<<p7102, fig.width=8, fig.height=12, out.width='.9\\linewidth'>>=
+colnames(result)[1] <- "Intercept"
+colnames(result)[5] <- "log_Miles"
+
+p1 <- ggplot(data = as.data.frame(result), aes(x = Intercept)) +
+    geom_histogram(aes(y = ..density..), colour = "black", fill = "white") + 
+    geom_density(size = 1) + theme_bw() + theme(text = element_text(size = 14)) + 
+    ggtitle("Intercept")
+
+p2 <- ggplot(data = as.data.frame(result), aes(x = Tax)) +
+    geom_histogram(aes(y = ..density..), colour = "black", fill = "white") + 
+    geom_density(size = 1) + theme_bw() + theme(text = element_text(size = 14)) +
+    ggtitle("Tax")
+
+p3 <- ggplot(data = as.data.frame(result), aes(x = Dlic)) +
+    geom_histogram(aes(y = ..density..), colour = "black", fill = "white") + 
+    geom_density(size = 1) + theme_bw() + theme(text = element_text(size = 14)) +
+    ggtitle("Dlic")
+
+p4 <- ggplot(data = as.data.frame(result), aes(x = Income)) +
+    geom_histogram(aes(y = ..density..), colour = "black", fill = "white") + 
+    geom_density(size = 1) + theme_bw() + theme(text = element_text(size = 14)) +
+    ggtitle("Income")
+
+p5 <- ggplot(data = as.data.frame(result), aes(x = log_Miles)) +
+    geom_histogram(aes(y = ..density..), colour = "black", fill = "white") + 
+    geom_density(size = 1) + theme_bw() + theme(text = element_text(size = 14)) +
+    ggtitle("log_Miles")
+
+grid.arrange(p1, p2, p3, p4, p5, ncol=2)
+@
+
+According to the histograms above, we can say that the histograms are not all symmetric, and not all of them look like normally distributed data. For example, the coefficient of the intercept seems like skewed, and the distribution of coefficient of \m{Dlic} seems has two peaks, suggesting that they may not be normally distributed, so that the large sample normal theory may not be appropriate to these data. 
+
+However, it's kind of hard to say that whether the histograms support or refuse the differences between the bootstrap and large sample confidence intervals, because the shape of a histogram is also largely affected by the binwidth we choose, and it's risky to make decision based on histograms. Maybe we need to do some non-parametric test to determine whether they are normally distributed, and then we can say that if the differences are supported.
+
+
+\end{document}

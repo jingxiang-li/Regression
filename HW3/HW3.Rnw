@@ -96,7 +96,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 # set global chunk options
-opts_chunk$set(fig.path='figure/', fig.align='center', fig.show='hold', tidy.opts=list(keep.blank.line=FALSE, width.cutoff=60), warning=FALSE, error=FALSE, message=FALSE, echo=TRUE)
+opts_chunk$set(fig.path='figure/', fig.align='center', fig.show='hold', tidy=FALSE, tidy.opts=list(keep.blank.line=TRUE, width.cutoff=60, comment=FALSE), warning=FALSE, error=FALSE, message=FALSE, echo=TRUE)
 #, sanitize=TRUE, dev="tikz")
 options(replace.assign=TRUE,width=90)
 knit_theme$set("edit-eclipse")
