@@ -440,6 +440,7 @@ In this problem, since the linear form of model is appropriate, we apply residua
 \subproblem{7.10.2}
 Examine the histograms of the bootstrap replications for each of the coefficients. Are the histograms symmetric or skewed? Do they look like normally distributed data, as they would if the large sample normal theory applied to these data? Do the histograms support or refute the differences between the bootstrap and large sample confidence intervals found in Problem 7.10.1?
 
+\solution
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
 \begin{alltt}
@@ -485,7 +486,249 @@ Examine the histograms of the bootstrap replications for each of the coefficient
 
 According to the histograms above, we can say that the histograms are not all symmetric, and not all of them look like normally distributed data. For example, the coefficient of the intercept seems like skewed, and the distribution of coefficient of \m{Dlic} seems has two peaks, suggesting that they may not be normally distributed, so that the large sample normal theory may not be appropriate to these data. 
 
-However, it's kind of hard to say that the histograms support or refuse the differences between the bootstrap and large sample confidence intervals, because the shape of a histogram is largely affected by the binwitdh we choose, and it's risky to make decision based on histograms. Maybe we need to do some non-parametric test to determine whether they are normally distributed, and then we can say that if the differences are supported.
+However, it's kind of hard to say that whether the histograms support or refuse the differences between the bootstrap and large sample confidence intervals, because the shape of a histogram is also largely affected by the binwidth we choose, and it's risky to make decision based on histograms. Maybe we need to do some non-parametric test to determine whether they are normally distributed, and then we can say that if the differences are supported or not.
 
+\problem{10.2}
+(Data file: \textbf{Highway})
+
+\subproblem{10.2.1}
+For the highway accident data, use your software to verify the forward selection and backward elimination subsets that are given in Section 10.2.2.
+
+\solution
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{data} \hlkwb{<-} \hlstd{Highway}
+\hlstd{data}\hlopt{$}\hlstd{sigs1} \hlkwb{<-} \hlstd{(data}\hlopt{$}\hlstd{sigs} \hlopt{*} \hlstd{data}\hlopt{$}\hlstd{len} \hlopt{+} \hlnum{1}\hlstd{)} \hlopt{/} \hlstd{data}\hlopt{$}\hlstd{len}
+\hlstd{m} \hlkwb{<-} \hlkwd{lm}\hlstd{(}\hlkwd{log}\hlstd{(rate)} \hlopt{~} \hlkwd{log}\hlstd{(len)} \hlopt{+} \hlkwd{log}\hlstd{(adt)} \hlopt{+} \hlkwd{log}\hlstd{(trks)} \hlopt{+} \hlkwd{log}\hlstd{(shld)} \hlopt{+} \hlkwd{log}\hlstd{(sigs1)} \hlopt{+}
+            \hlstd{lane} \hlopt{+} \hlstd{slim} \hlopt{+} \hlstd{shld} \hlopt{+} \hlstd{lwid} \hlopt{+} \hlstd{acpt} \hlopt{+} \hlstd{itg} \hlopt{+} \hlstd{htype,} \hlkwc{data} \hlstd{= data)}
+\hlstd{m_min} \hlkwb{<-} \hlkwd{lm}\hlstd{(}\hlkwd{log}\hlstd{(rate)} \hlopt{~} \hlstd{shld} \hlopt{+} \hlkwd{log}\hlstd{(len),} \hlkwc{data} \hlstd{= data)}
+\hlstd{m_forward} \hlkwb{<-} \hlkwd{step}\hlstd{(m_min,} \hlkwc{scope} \hlstd{=} \hlkwd{formula}\hlstd{(m),} \hlkwc{direction} \hlstd{=} \hlstr{"forward"}\hlstd{,}
+                  \hlkwc{trace} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+\hlstd{m_backward} \hlkwb{<-} \hlkwd{step}\hlstd{(m,} \hlkwc{scope} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{lower} \hlstd{=} \hlkwd{formula}\hlstd{(m_min)),}
+                   \hlkwc{direction} \hlstd{=} \hlstr{"backward"}\hlstd{,} \hlkwc{trace} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+
+\hlcom{## forward selection}
+\hlkwd{summary}\hlstd{(m_forward)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = log(rate) ~ shld + log(len) + acpt + log(sigs1), 
+##     data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.4394 -0.1844 -0.0352  0.2384  0.4661 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  2.16330    0.29354    7.37  1.5e-08 ***
+## shld        -0.04491    0.01671   -2.69   0.0111 *  
+## log(len)    -0.26795    0.09068   -2.95   0.0056 ** 
+## acpt         0.01562    0.00598    2.61   0.0133 *  
+## log(sigs1)   0.09986    0.04467    2.24   0.0321 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.273 on 34 degrees of freedom
+## Multiple R-squared:  0.69,	Adjusted R-squared:  0.653 
+## F-statistic: 18.9 on 4 and 34 DF,  p-value: 2.92e-08
+\end{verbatim}
+\begin{alltt}
+\hlcom{## backward selection}
+\hlkwd{summary}\hlstd{(m_backward)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = log(rate) ~ log(len) + log(adt) + log(sigs1) + slim + 
+##     shld + htype, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.5842 -0.1179 -0.0252  0.0960  0.4561 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  4.42937    0.62740    7.06  7.5e-08 ***
+## log(len)    -0.25768    0.08445   -3.05   0.0047 ** 
+## log(adt)    -0.13099    0.08534   -1.53   0.1353    
+## log(sigs1)   0.20838    0.05930    3.51   0.0014 ** 
+## slim        -0.03190    0.01245   -2.56   0.0156 *  
+## shld         0.00681    0.02398    0.28   0.7784    
+## htypefai     0.11833    0.34202    0.35   0.7318    
+## htypepa     -0.38224    0.23619   -1.62   0.1161    
+## htypema     -0.14106    0.20511   -0.69   0.4969    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.247 on 30 degrees of freedom
+## Multiple R-squared:  0.776,	Adjusted R-squared:  0.716 
+## F-statistic:   13 on 8 and 30 DF,  p-value: 7.29e-08
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Note that the forward selection and backward selection subsets we have from the code chunk above are excatly the same as what are given in Section 10.2.2.
+
+\subproblem{10.2.2}
+Use as response $log(\m{rate}\times\m{len})$ and treat lwid as the focal regressor. Use both forward selection and backward elimination to assess the importance of lwid. Summarize your results.
+
+\solution
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{data}\hlopt{$}\hlstd{log_rate_len} \hlkwb{<-} \hlkwd{log}\hlstd{(data}\hlopt{$}\hlstd{rate} \hlopt{*} \hlstd{data}\hlopt{$}\hlstd{len)}
+\hlstd{m_max} \hlkwb{<-} \hlkwd{lm}\hlstd{(log_rate_len} \hlopt{~} \hlkwd{log}\hlstd{(len)} \hlopt{+} \hlkwd{log}\hlstd{(adt)} \hlopt{+} \hlkwd{log}\hlstd{(trks)} \hlopt{+} \hlkwd{log}\hlstd{(shld)} \hlopt{+} \hlkwd{log}\hlstd{(sigs1)} \hlopt{+}
+                \hlstd{lane} \hlopt{+} \hlstd{slim} \hlopt{+} \hlstd{shld} \hlopt{+} \hlstd{lwid} \hlopt{+} \hlstd{acpt} \hlopt{+} \hlstd{itg} \hlopt{+} \hlstd{htype,} \hlkwc{data} \hlstd{= data)}
+\hlstd{m_min} \hlkwb{<-} \hlkwd{lm}\hlstd{(log_rate_len} \hlopt{~} \hlstd{lwid,} \hlkwc{data} \hlstd{= data)}
+
+\hlstd{m_forward} \hlkwb{<-} \hlkwd{step}\hlstd{(m_min,} \hlkwc{scope} \hlstd{=} \hlkwd{formula}\hlstd{(m_max),} \hlkwc{direction} \hlstd{=} \hlstr{"forward"}\hlstd{,}
+                  \hlkwc{trace} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+\hlstd{m_backward} \hlkwb{<-} \hlkwd{step}\hlstd{(m_max,} \hlkwc{scope} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{lower} \hlstd{=} \hlkwd{formula}\hlstd{(m_min)),}
+                   \hlkwc{direction} \hlstd{=} \hlstr{"backward"}\hlstd{,} \hlkwc{trace} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+
+\hlkwd{summary}\hlstd{(m_forward)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = log_rate_len ~ lwid + log(len) + slim + acpt + log(trks), 
+##     data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.5152 -0.1617  0.0397  0.1733  0.5563 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  4.80121    1.46241    3.28   0.0024 ** 
+## lwid        -0.05235    0.10359   -0.51   0.6167    
+## log(len)     0.75168    0.08938    8.41    1e-09 ***
+## slim        -0.03117    0.01046   -2.98   0.0054 ** 
+## acpt         0.01086    0.00675    1.61   0.1171    
+## log(trks)   -0.33565    0.21626   -1.55   0.1302    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.273 on 33 degrees of freedom
+## Multiple R-squared:  0.75,	Adjusted R-squared:  0.713 
+## F-statistic: 19.8 on 5 and 33 DF,  p-value: 4.28e-09
+\end{verbatim}
+\begin{alltt}
+\hlkwd{summary}\hlstd{(m_backward)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = log_rate_len ~ log(len) + log(adt) + log(sigs1) + 
+##     slim + lwid + htype, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.4707 -0.1212 -0.0209  0.1019  0.4535 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  3.65585    1.32782    2.75   0.0099 ** 
+## log(len)     0.75333    0.08690    8.67  1.1e-09 ***
+## log(adt)    -0.13616    0.08530   -1.60   0.1209    
+## log(sigs1)   0.21702    0.06093    3.56   0.0013 ** 
+## slim        -0.02971    0.00979   -3.04   0.0049 ** 
+## lwid         0.05676    0.09832    0.58   0.5680    
+## htypefai     0.15770    0.34508    0.46   0.6510    
+## htypepa     -0.36249    0.23278   -1.56   0.1299    
+## htypema     -0.12339    0.20689   -0.60   0.5554    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.246 on 30 degrees of freedom
+## Multiple R-squared:  0.816,	Adjusted R-squared:  0.767 
+## F-statistic: 16.6 on 8 and 30 DF,  p-value: 4.34e-09
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+As the result we see that the forward model end up with 5 regressors, \m{lwid}, \m{log(len)}, \m{slim}, \m{acpt} and \m{log(trks)}. The p-value of our focal regressor \m{lwid} is very large, suggesting that the \m{lwid} does not have significant effect on the response term.
+
+Then, 6 regressors included in the backward selection model, they are \m{log(len)}, \m{log(adt)}, \m{log(sigs1)}, \m{slim}, \m{lwid} and \m{htype}. Note that the p-value of focal regressor \m{lwid} is still very large, which means that the main effect of \m{lwid} over the response is negligible.
+
+\subproblem{10.2.3}
+Using the identity $log(\m{rate}\times\m{len}) = log(\m{rate}) + log(\m{len})$, we can write
+$$E(log(\m{rate}\times\m{len})|X = x) = \beta_{0} + \beta'x$$
+$$E(log(\m{rate}) + log(\m{len})|X = x) = \beta_{0} + \beta'x$$
+$$E(log(\m{rate})|X=x) = \beta_{0} + \beta'x - log(\m{len})$$
+In this last equation, the variable $log(\m{len})$ is on the right side of the equation with an implied known regression coefficient equal to −1. A regressor with a known regression coefficient is called an \emph{offset}, and most modern regression software allows you to include offsets in fitting a model. The difference between an offset and a regressor is that no coefficient will be estimated for the offset.\par
+Repeat Problem 10.2.2, but use log(rate) as the response and $−log(\m{len})$ as an offset. Is the analysis the same or different? Explain.
+
+\solution
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{m_max} \hlkwb{<-} \hlkwd{lm}\hlstd{(}\hlkwd{log}\hlstd{(rate)} \hlopt{~} \hlkwd{offset}\hlstd{(}\hlopt{-}\hlkwd{log}\hlstd{(len))} \hlopt{+} \hlkwd{log}\hlstd{(adt)} \hlopt{+} \hlkwd{log}\hlstd{(trks)} \hlopt{+} \hlkwd{log}\hlstd{(shld)} \hlopt{+}
+                \hlkwd{log}\hlstd{(sigs1)} \hlopt{+} \hlstd{lane} \hlopt{+} \hlstd{slim} \hlopt{+} \hlstd{shld} \hlopt{+} \hlstd{lwid} \hlopt{+} \hlstd{acpt} \hlopt{+} \hlstd{itg} \hlopt{+} \hlstd{htype,}
+            \hlkwc{data} \hlstd{= data)}
+\hlstd{m_min} \hlkwb{<-} \hlkwd{lm}\hlstd{(}\hlkwd{log}\hlstd{(rate)} \hlopt{~} \hlstd{lwid} \hlopt{+} \hlkwd{offset}\hlstd{(}\hlopt{-}\hlkwd{log}\hlstd{(len)),} \hlkwc{data} \hlstd{= data)}
+\hlstd{m_forward} \hlkwb{<-} \hlkwd{step}\hlstd{(m_min,} \hlkwc{scope} \hlstd{=} \hlkwd{formula}\hlstd{(m_max),} \hlkwc{direction} \hlstd{=} \hlstr{"forward"}\hlstd{,}
+                  \hlkwc{trace} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+\hlstd{m_backward} \hlkwb{<-} \hlkwd{step}\hlstd{(m_max,} \hlkwc{scope} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{lower} \hlstd{=} \hlkwd{formula}\hlstd{(m_min)),}
+                   \hlkwc{direction} \hlstd{=} \hlstr{"backward"}\hlstd{,} \hlkwc{trace} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+
+\hlkwd{summary}\hlstd{(m_forward)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = log(rate) ~ lwid + shld + log(shld) + offset(-log(len)), 
+##     data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.8838 -0.3298 -0.0145  0.1978  0.7301 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)   7.5330     1.9484    3.87  0.00046 ***
+## lwid         -0.3071     0.1553   -1.98  0.05591 .  
+## shld         -0.2222     0.0897   -2.48  0.01825 *  
+## log(shld)     0.7344     0.4564    1.61  0.11657    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.414 on 35 degrees of freedom
+## Multiple R-squared:  0.688,	Adjusted R-squared:  0.661 
+## F-statistic: 25.7 on 3 and 35 DF,  p-value: 5.77e-09
+\end{verbatim}
+\begin{alltt}
+\hlkwd{summary}\hlstd{(m_backward)}
+\end{alltt}
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = log(rate) ~ log(shld) + shld + lwid + offset(-log(len)), 
+##     data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.8838 -0.3298 -0.0145  0.1978  0.7301 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)   7.5330     1.9484    3.87  0.00046 ***
+## log(shld)     0.7344     0.4564    1.61  0.11657    
+## shld         -0.2222     0.0897   -2.48  0.01825 *  
+## lwid         -0.3071     0.1553   -1.98  0.05591 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.414 on 35 degrees of freedom
+## Multiple R-squared:  0.688,	Adjusted R-squared:  0.661 
+## F-statistic: 25.7 on 3 and 35 DF,  p-value: 5.77e-09
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Since we view $-log(\m{len})$ as an offset, the coefficient of $log(\m{len})$ will be set as -1, so that the other predictors' estimates will not be affected by $log(\m{len})$. In this way, we see that both two models select the same three regressors, which are \m{lwid}, \m{shld} and \m{log(shld)}. Then the p-value of focal predictor \m{lwid} is very close to 0.05, suggesting that the main effect of \m{lwid} is worthy of further attention and study, and we need more samples to certify its significance.
 
 \end{document}

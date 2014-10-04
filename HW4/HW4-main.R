@@ -128,5 +128,39 @@ p5 <- ggplot(data = as.data.frame(result), aes(x = log_Miles)) +
     ggtitle("log_Miles")
 
 
+# 10.2 --------------------------------------------------------------------
 
+data <- Highway
+data$sigs1 <- (data$sigs * data$len + 1) / data$len
+m <- lm(log(rate) ~ log(len) + log(adt) + log(trks) + log(shld) + log(sigs1) + 
+            lane + slim + shld + lwid + acpt + itg + htype, data = data)
+m_min <- lm(log(rate) ~ shld + log(len), data = data)
+m_forward <- step(m_min, scope = formula(m), direction = "forward", trace = FALSE)
+m_backward <- step(m, scope = list(lower = formula(m_min)), direction = "backward", trace = FALSE)
 
+ceof(m_forward)
+
+coef(m_backward)
+
+###
+data$log_rate_len <- log(data$rate * data$len)
+m_max <- lm(log_rate_len ~ log(len) + log(adt) + log(trks) + log(shld) + log(sigs1) + 
+                lane + slim + shld + lwid + acpt + itg + htype, data = data)
+m_min <- lm(log_rate_len ~ lwid, data = data)
+
+m_forward <- step(m_min, scope = formula(m_max), direction = "forward", 
+                  trace = FALSE)
+m_backward <- step(m_max, scope = list(lower = formula(m_min)), 
+                   direction = "backward", trace = FALSE)
+
+summary(m_forward)
+summary(m_backward)
+
+###
+m_max <- lm(log(rate) ~ log(len) + log(adt) + log(trks) + log(shld) + log(sigs1) + 
+                lane + slim + shld + lwid + acpt + itg + htype, data = data, offset = -log(len))
+m_min <- lm(log(rate) ~ lwid, data = data, offset = log(len))
+m_forward <- step(m_min, scope = formula(m_max), direction = "forward", 
+                  trace = FALSE)
+m_backward <- step(m_max, scope = list(lower = formula(m_min)), 
+                   direction = "backward", trace = FALSE)

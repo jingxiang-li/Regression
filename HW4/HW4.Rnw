@@ -95,7 +95,7 @@
 
 <<setup, include=FALSE, cache=FALSE>>=
 # set global chunk options
-opts_chunk$set(fig.path='figure/', fig.align='center', fig.show='hold', tidy=FALSE, tidy.opts=list(keep.blank.line=TRUE, width.cutoff=60, comment=FALSE), warning=FALSE, error=FALSE, message=FALSE, echo=TRUE)
+opts_chunk$set(fig.path='figure/', fig.align='center', fig.show='hold', tidy=FALSE, tidy.opts=list(keep.blank.line=TRUE, width.cutoff=50), warning=FALSE, error=FALSE, message=FALSE, echo=TRUE)
 #, sanitize=TRUE, dev="tikz")
 options(replace.assign=TRUE,width=90)
 knit_theme$set("edit-eclipse")
@@ -304,6 +304,7 @@ In this problem, since the linear form of model is appropriate, we apply residua
 \subproblem{7.10.2}
 Examine the histograms of the bootstrap replications for each of the coefficients. Are the histograms symmetric or skewed? Do they look like normally distributed data, as they would if the large sample normal theory applied to these data? Do the histograms support or refute the differences between the bootstrap and large sample confidence intervals found in Problem 7.10.1?
 
+\solution
 <<p7102, fig.width=8, fig.height=12, out.width='.9\\linewidth'>>=
 colnames(result)[1] <- "Intercept"
 colnames(result)[5] <- "log_Miles"
@@ -338,7 +339,82 @@ grid.arrange(p1, p2, p3, p4, p5, ncol=2)
 
 According to the histograms above, we can say that the histograms are not all symmetric, and not all of them look like normally distributed data. For example, the coefficient of the intercept seems like skewed, and the distribution of coefficient of \m{Dlic} seems has two peaks, suggesting that they may not be normally distributed, so that the large sample normal theory may not be appropriate to these data. 
 
-However, it's kind of hard to say that whether the histograms support or refuse the differences between the bootstrap and large sample confidence intervals, because the shape of a histogram is also largely affected by the binwidth we choose, and it's risky to make decision based on histograms. Maybe we need to do some non-parametric test to determine whether they are normally distributed, and then we can say that if the differences are supported.
+However, it's kind of hard to say that whether the histograms support or refuse the differences between the bootstrap and large sample confidence intervals, because the shape of a histogram is also largely affected by the binwidth we choose, and it's risky to make decision based on histograms. Maybe we need to do some non-parametric test to determine whether they are normally distributed, and then we can say that if the differences are supported or not.
 
+\problem{10.2}
+(Data file: \textbf{Highway})
+
+\subproblem{10.2.1}
+For the highway accident data, use your software to verify the forward selection and backward elimination subsets that are given in Section 10.2.2.
+
+\solution
+<<p1021>>=
+data <- Highway
+data$sigs1 <- (data$sigs * data$len + 1) / data$len
+m <- lm(log(rate) ~ log(len) + log(adt) + log(trks) + log(shld) + log(sigs1) + 
+            lane + slim + shld + lwid + acpt + itg + htype, data = data)
+m_min <- lm(log(rate) ~ shld + log(len), data = data)
+m_forward <- step(m_min, scope = formula(m), direction = "forward", 
+                  trace = FALSE)
+m_backward <- step(m, scope = list(lower = formula(m_min)), 
+                   direction = "backward", trace = FALSE)
+
+## forward selection
+summary(m_forward)
+
+## backward selection
+summary(m_backward)
+@
+
+Note that the forward selection and backward selection subsets we have from the code chunk above are excatly the same as what are given in Section 10.2.2.
+
+\subproblem{10.2.2}
+Use as response $log(\m{rate}\times\m{len})$ and treat lwid as the focal regressor. Use both forward selection and backward elimination to assess the importance of lwid. Summarize your results.
+
+\solution
+<<p1022>>=
+data$log_rate_len <- log(data$rate * data$len)
+m_max <- lm(log_rate_len ~ log(len) + log(adt) + log(trks) + log(shld) + log(sigs1) + 
+                lane + slim + shld + lwid + acpt + itg + htype, data = data)
+m_min <- lm(log_rate_len ~ lwid, data = data)
+
+m_forward <- step(m_min, scope = formula(m_max), direction = "forward", 
+                  trace = FALSE)
+m_backward <- step(m_max, scope = list(lower = formula(m_min)), 
+                   direction = "backward", trace = FALSE)
+
+summary(m_forward)
+summary(m_backward)
+@
+
+As the result we see that the forward model end up with 5 regressors, \m{lwid}, \m{log(len)}, \m{slim}, \m{acpt} and \m{log(trks)}. The p-value of our focal regressor \m{lwid} is very large, suggesting that the \m{lwid} does not have significant effect on the response term.
+
+Then, 6 regressors included in the backward selection model, they are \m{log(len)}, \m{log(adt)}, \m{log(sigs1)}, \m{slim}, \m{lwid} and \m{htype}. Note that the p-value of focal regressor \m{lwid} is still very large, which means that the main effect of \m{lwid} over the response is negligible.
+
+\subproblem{10.2.3}
+Using the identity $log(\m{rate}\times\m{len}) = log(\m{rate}) + log(\m{len})$, we can write
+$$E(log(\m{rate}\times\m{len})|X = x) = \beta_{0} + \beta'x$$
+$$E(log(\m{rate}) + log(\m{len})|X = x) = \beta_{0} + \beta'x$$
+$$E(log(\m{rate})|X=x) = \beta_{0} + \beta'x - log(\m{len})$$
+In this last equation, the variable $log(\m{len})$ is on the right side of the equation with an implied known regression coefficient equal to −1. A regressor with a known regression coefficient is called an \emph{offset}, and most modern regression software allows you to include offsets in fitting a model. The difference between an offset and a regressor is that no coefficient will be estimated for the offset.\par
+Repeat Problem 10.2.2, but use log(rate) as the response and $−log(\m{len})$ as an offset. Is the analysis the same or different? Explain.
+
+\solution
+<<p1023>>=
+
+m_max <- lm(log(rate) ~ offset(-log(len)) + log(adt) + log(trks) + log(shld) + 
+                log(sigs1) + lane + slim + shld + lwid + acpt + itg + htype, 
+            data = data)
+m_min <- lm(log(rate) ~ lwid + offset(-log(len)), data = data)
+m_forward <- step(m_min, scope = formula(m_max), direction = "forward", 
+                  trace = FALSE)
+m_backward <- step(m_max, scope = list(lower = formula(m_min)), 
+                   direction = "backward", trace = FALSE)
+
+summary(m_forward)
+summary(m_backward)
+@
+
+Since we view $-log(\m{len})$ as an offset, the coefficient of $log(\m{len})$ will be set as -1, so that the other predictors' estimates will not be affected by $log(\m{len})$. In this way, we see that both two models select the same three regressors, which are \m{lwid}, \m{shld} and \m{log(shld)}. Then the p-value of focal predictor \m{lwid} is very close to 0.05, suggesting that the main effect of \m{lwid} is worthy of further attention and study, and we need more samples to certify its significance.
 
 \end{document}
