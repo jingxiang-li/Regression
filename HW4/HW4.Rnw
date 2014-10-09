@@ -223,11 +223,19 @@ summary(m)
 Is the fitted regression consistent with the known standard weight for a new coin?
 
 \solution
-To obtain the average weight for a new coin, we only need refer to the intercept term.
+
+\solution
+To show whether the fitted regression consistent with the known standard weight for a new coin, we apply 2-side t-test on the intercept term and see the p-value.
 <<p783>>=
-coef(m)
+m_summary <- summary(m)
+intcpt_coef <- m_summary$coef[1,1]
+intcpt_sd <- m_summary$coef[1,2]
+t_test <- (intcpt_coef - 7.9876) / intcpt_sd
+## Using t-test Obtain p-value
+p <- 2 * (1 - pt(abs(t_test), m$df.residual))
+p
 @
-Note that the fitted intercept is 8.0027, which is larger than the standard weight 7.9876, suggesting that it is consistent with the known standard weight for a new coin.
+Note that the p-value obtained from the t-test is \Sexpr{p}, so that it is hard to determine the level of significance of the intercept term. Maybe we need more sample to certify its significance.
 
 \subproblem{7.8.4}
 For previously unsampled coins of $\m{Age} = 1, 2, 3, 4, 5$, estimate the probability that the weight of the coin is less than the legal minimum.\par
@@ -366,7 +374,7 @@ summary(m_forward)
 summary(m_backward)
 @
 
-Note that the forward selection and backward selection subsets we have from the code chunk above are excatly the same as what are given in Section 10.2.2.
+Note that the forward selection and backward selection subsets we have from the code chunk above are exactly the same as what are given in Section 10.2.2.
 
 \subproblem{10.2.2}
 Use as response $log(\m{rate}\times\m{len})$ and treat lwid as the focal regressor. Use both forward selection and backward elimination to assess the importance of lwid. Summarize your results.

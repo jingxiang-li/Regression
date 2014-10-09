@@ -320,19 +320,26 @@ To fit a simple linear regression model with Weight as the response, wls should 
 Is the fitted regression consistent with the known standard weight for a new coin?
 
 \solution
-To obtain the average weight for a new coin, we only need refer to the intercept term.
+
+\solution
+To show whether the fitted regression consistent with the known standard weight for a new coin, we apply 2-side t-test on the intercept term and see the p-value.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{coef}\hlstd{(m)}
+\hlstd{m_summary} \hlkwb{<-} \hlkwd{summary}\hlstd{(m)}
+\hlstd{intcpt_coef} \hlkwb{<-} \hlstd{m_summary}\hlopt{$}\hlstd{coef[}\hlnum{1}\hlstd{,}\hlnum{1}\hlstd{]}
+\hlstd{intcpt_sd} \hlkwb{<-} \hlstd{m_summary}\hlopt{$}\hlstd{coef[}\hlnum{1}\hlstd{,}\hlnum{2}\hlstd{]}
+\hlstd{t_test} \hlkwb{<-} \hlstd{(intcpt_coef} \hlopt{-} \hlnum{7.9876}\hlstd{)} \hlopt{/} \hlstd{intcpt_sd}
+\hlcom{## Using t-test Obtain p-value}
+\hlstd{p} \hlkwb{<-} \hlnum{2} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{pt}\hlstd{(}\hlkwd{abs}\hlstd{(t_test), m}\hlopt{$}\hlstd{df.residual))}
+\hlstd{p}
 \end{alltt}
 \begin{verbatim}
-## (Intercept)         Age 
-##      8.0027     -0.0261
+## [1] 0.07373
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
-Note that the fitted intercept is 8.0027, which is larger than the standard weight 7.9876, suggesting that it is consistent with the known standard weight for a new coin.
+Note that the p-value obtained from the t-test is 0.0737, so that it is hard to determine the level of significance of the intercept term. Maybe we need more sample to certify its significance.
 
 \subproblem{7.8.4}
 For previously unsampled coins of $\m{Age} = 1, 2, 3, 4, 5$, estimate the probability that the weight of the coin is less than the legal minimum.\par
@@ -570,7 +577,7 @@ For the highway accident data, use your software to verify the forward selection
 \end{kframe}
 \end{knitrout}
 
-Note that the forward selection and backward selection subsets we have from the code chunk above are excatly the same as what are given in Section 10.2.2.
+Note that the forward selection and backward selection subsets we have from the code chunk above are exactly the same as what are given in Section 10.2.2.
 
 \subproblem{10.2.2}
 Use as response $log(\m{rate}\times\m{len})$ and treat lwid as the focal regressor. Use both forward selection and backward elimination to assess the importance of lwid. Summarize your results.
