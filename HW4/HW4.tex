@@ -403,9 +403,11 @@ Use the bootstrap to estimate confidence intervals for the coefficients in the f
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlstd{data} \hlkwb{<-} \hlstd{fuel2001}
-\hlstd{data}\hlopt{$}\hlstd{Dlic} \hlkwb{<-} \hlstd{data}\hlopt{$}\hlstd{Drivers} \hlopt{/} \hlstd{data}\hlopt{$}\hlstd{Pop}
+\hlstd{data}\hlopt{$}\hlstd{Dlic} \hlkwb{<-} \hlnum{1000} \hlopt{*} \hlstd{data}\hlopt{$}\hlstd{Drivers} \hlopt{/} \hlstd{data}\hlopt{$}\hlstd{Pop}
 \hlstd{data}\hlopt{$}\hlstd{Fuel} \hlkwb{<-} \hlnum{1000} \hlopt{*} \hlstd{data}\hlopt{$}\hlstd{FuelC} \hlopt{/} \hlstd{data}\hlopt{$}\hlstd{Pop}
-\hlstd{m} \hlkwb{<-} \hlkwd{lm}\hlstd{(Fuel} \hlopt{~} \hlstd{Tax} \hlopt{+} \hlstd{Dlic} \hlopt{+} \hlstd{Income} \hlopt{+} \hlkwd{log}\hlstd{(Miles),} \hlkwc{data} \hlstd{= data)}
+\hlstd{data}\hlopt{$}\hlstd{Income} \hlkwb{<-} \hlstd{data}\hlopt{$}\hlstd{Income} \hlopt{/} \hlnum{1000}
+\hlstd{data}\hlopt{$}\hlstd{log_miles} \hlkwb{<-} \hlkwd{log}\hlstd{(data}\hlopt{$}\hlstd{Miles,} \hlnum{2}\hlstd{)}
+\hlstd{m} \hlkwb{<-} \hlkwd{lm}\hlstd{(Fuel} \hlopt{~} \hlstd{Tax} \hlopt{+} \hlstd{Dlic} \hlopt{+} \hlstd{Income} \hlopt{+} \hlstd{log_miles,} \hlkwc{data} \hlstd{= data)}
 \hlstd{data_ori} \hlkwb{<-} \hlstd{data}
 
 \hlkwd{library}\hlstd{(boot)}
@@ -426,18 +428,18 @@ Use the bootstrap to estimate confidence intervals for the coefficients in the f
 \hlkwd{apply}\hlstd{(}\hlkwc{X} \hlstd{= result,} \hlkwc{MARGIN} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{FUN} \hlstd{= quantile,} \hlkwc{probs} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0.025}\hlstd{,} \hlnum{0.975}\hlstd{))}
 \end{alltt}
 \begin{verbatim}
-##       (Intercept)    Tax  Dlic    Income log(Miles)
-## 2.5%       -219.1 -7.870 231.1 -0.010151      8.587
-## 97.5%       560.6 -0.405 705.6 -0.002059     44.601
+##       (Intercept)    Tax   Dlic  Income log_miles
+## 2.5%       -219.1 -7.870 0.2311 -10.151     8.587
+## 97.5%       560.6 -0.405 0.7056  -2.059    44.601
 \end{verbatim}
 \begin{alltt}
 \hlcom{## OLS confidence interval}
 \hlkwd{t}\hlstd{(}\hlkwd{confint}\hlstd{(m))}
 \end{alltt}
 \begin{verbatim}
-##        (Intercept)     Tax  Dlic   Income log(Miles)
-## 2.5 %       -238.1 -8.3144 213.2 -0.01055       7.96
-## 97.5 %       546.5 -0.1416 730.6 -0.00172      45.55
+##        (Intercept)     Tax   Dlic Income log_miles
+## 2.5 %       -238.1 -8.3144 0.2132 -10.55     5.517
+## 97.5 %       546.5 -0.1416 0.7306  -1.72    31.573
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -660,6 +662,9 @@ Use as response $log(\m{rate}\times\m{len})$ and treat lwid as the focal regress
 As the result we see that the forward model end up with 5 regressors, \m{lwid}, \m{log(len)}, \m{slim}, \m{acpt} and \m{log(trks)}. The p-value of our focal regressor \m{lwid} is very large, suggesting that the \m{lwid} does not have significant effect on the response term.
 
 Then, 6 regressors included in the backward selection model, they are \m{log(len)}, \m{log(adt)}, \m{log(sigs1)}, \m{slim}, \m{lwid} and \m{htype}. Note that the p-value of focal regressor \m{lwid} is still very large, which means that the main effect of \m{lwid} over the response is negligible.
+
+Since the response term can be rewritten as $log(\m{rate} \times \m{len}) = log(\m{rate}) + log(\m{len})$, and note that we include $log(\m{len})$ as a predictor, the significance of $log(\m{len})$ will be extremely large, and other predictors' level of significance will be largely influenced by $log(\m{len})$, suggesting that the estimated significane level for other predicors may be far away from the truth. Therefore the model is unstable, and this is the reason why the forward model and the backward model have such a big difference. To fix this issue, we should either exclude predictor $log(\m{len})$, or use offset regression model.
+
 
 \subproblem{10.2.3}
 Using the identity $log(\m{rate}\times\m{len}) = log(\m{rate}) + log(\m{len})$, we can write
