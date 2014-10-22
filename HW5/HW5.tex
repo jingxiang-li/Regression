@@ -1,0 +1,392 @@
+%!TEX program = xelatex
+%# -*- coding: utf-8 -*-
+%!TEX encoding = UTF-8 Unicode
+
+\documentclass[12pt,oneside,a4paper]{article}\usepackage[]{graphicx}\usepackage[]{xcolor}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0, 0, 0}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0,0,1}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.443,0.478,0.702}{#1}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.498,0,0.333}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.498,0,0.333}{\textbf{#1}}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.498,0,0.333}{\textbf{#1}}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2cm,bmargin=2cm,lmargin=2cm,rmargin=2cm}
+\usepackage[pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=2,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\hypersetup{pdfstartview={XYZ null null 1}}
+\usepackage{url}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{microtype}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage[retainorgcmds]{IEEEtrantools}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}} 
+\renewcommand{\algorithmicensure}{\textbf{Output:}} 
+
+\usepackage[sc]{mathpazo}
+\linespread{1.1}
+\usepackage[T1]{fontenc}
+
+
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage[figure]{hypcap}
+\usepackage[hypcap]{caption}
+\usepackage{tikz}
+%\usepackage{grffile} 
+%\usepackage{float} 
+\usepackage{pdfpages}
+
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+
+%\usepackage[square,numbers,super,comma,sort]{natbib}
+%\usepackage[backend=biber, style=nature, sorting=none, isbn=false, url=false, doi=false]{biblatex}
+%\addbibresource{ref.bib}
+%\usepackage[]{authblk}
+
+\usepackage{verbatim}
+
+\newcommand{\problem}[1]
+{
+    \clearpage
+    \section*{Problem {#1}}
+}
+
+\newcommand{\subproblem}[1]
+{
+    \subsection*{Problem {#1}}
+}
+
+
+\newcommand{\solution}
+{
+    \vspace{15pt}
+    \noindent\ignorespaces\textbf{\large Solution}\par
+}
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\lhead{\hmwkAuthorName}
+\chead{\hmwkTitle}
+\rhead{\firstxmark}
+\cfoot{\thepage}
+
+\newcommand{\hmwkTitle}{STAT 8051 HW 5}
+\newcommand{\hmwkAuthorName}{Jingxiang Li}
+
+\setlength\headheight{15pt}
+\setlength\parindent{0pt}
+\setlength{\parskip}{0.5em}
+
+\newcommand{\m}[1]{\texttt{{#1}}}
+
+
+\pagestyle{fancy}
+
+\title{\hmwkTitle}
+\author{\hmwkAuthorName}
+\date{\today}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\maketitle
+
+
+
+\problem{11.3}
+(Data file: \m{walleye}) The data in the file \m{walleye} give the \m{length} in mm and the \m{age} in years of a sample of over 3,000 male walleye, a popular game fish, captured in Butternut Lake in Northern Wisconsin (LeBeau, 2004). The fish are also classified according to the time \m{period} in which they were captured, with $\m{period} = 1$ for pre-1990, $\m{period} = 2$ for 1990–1996, and $\m{period} = 3$ for 1997–2000. Management practices on the lake were different in each of the periods, so it is of interest to compare the length at age for the three time periods.
+
+Using the \emph{von Bertalanffy} length at age function (11.22), compare the three time periods. If different, are all the parameters different, or just some of them? Which ones? Summarize your results.
+
+\solution
+the \emph{von Bertalanffy} function is given by 
+$$E(\m{Length}|\m{Age} = t) = L_{\infty}(1 - \mathrm{exp}(-K(t - t_{0})))$$
+where $L_{\infty}$, $K$ and $t_{0}$ are unknown parameters. 
+
+To obtain the parameters within the \emph{von Bertalanffy} function, we should first consider a proper way to set the initial value for estimation. Since parameter $L_{\infty}$ is the expected value of \m{Length} for extremely large ages, we can set the initial value of $L_{\infty}$ as the maximum of \m{Length} plus the standard error of \m{Length}. Then we can $L_{\infty}$ as known parameter, so that the function become linear. Let's define $y = \mathrm{log}(1 - \frac{\m{Length}}{L_{\infty}})$ and run regression $y \sim 1 + \m{age}$. Therefore the estimated slope coefficient will be good initial value for $-K$, the ratio of the intercept over slope can be the initial value for $t_{0}$  
+
+Then we can estimate the parameters by using Gauss-Newton algorithm. Here we will build up 5 different models to see whether parameters are different for each time period. model \m{c1} will be the simplest model, which means all three parameters are the same for each time period. Then \m{c2} will be the most complex model, where all parameters are assumed as different for each time period. Then in \m{c3}, we assume that only $L_{\infty}$ is the same; in \m{c4}, we assume that only $K$ is the same; in \m{c5} we assume that only $t_{0}$ is the same, for each time period. 
+
+Lastly we will test the difference between each model by ANOVA.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{rm}\hlstd{(}\hlkwc{list} \hlstd{=} \hlkwd{ls}\hlstd{())}
+\hlkwd{require}\hlstd{(alr4)}
+
+\hlkwd{data} \hlstd{(walleye)}
+
+\hlcom{## Initialization}
+\hlstd{Linf} \hlkwb{<-} \hlkwd{max}\hlstd{(walleye}\hlopt{$}\hlstd{length)} \hlopt{+} \hlkwd{sd}\hlstd{(walleye}\hlopt{$}\hlstd{length)}
+\hlstd{m0} \hlkwb{<-} \hlkwd{lm}\hlstd{(}\hlkwd{log}\hlstd{(}\hlnum{1} \hlopt{-} \hlstd{length} \hlopt{/} \hlstd{Linf)} \hlopt{~} \hlstd{age,} \hlkwc{data} \hlstd{= walleye)}
+\hlstd{K}  \hlkwb{<-}  \hlopt{-} \hlkwd{coef}\hlstd{(m0)[}\hlnum{2}\hlstd{]}
+\hlstd{t0} \hlkwb{<-} \hlkwd{coef}\hlstd{(m0)[}\hlnum{1}\hlstd{]} \hlopt{/} \hlkwd{coef}\hlstd{(m0)[}\hlnum{2}\hlstd{]}
+
+\hlcom{## c1 Simplest model, same K, same Linf and same t0}
+\hlstd{c1} \hlkwb{<-} \hlkwd{nls}\hlstd{(length} \hlopt{~} \hlstd{Linf} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t0))),}
+          \hlkwc{start} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{Linf} \hlstd{= Linf,} \hlkwc{K} \hlstd{= K,} \hlkwc{t0} \hlstd{= t0),}
+          \hlkwc{data} \hlstd{= walleye)}
+\hlcom{## c2 Most complex model, different K, different Linf and different t0}
+\hlstd{c2} \hlkwb{<-} \hlkwd{nls}\hlstd{(length} \hlopt{~} \hlstd{(period} \hlopt{==} \hlnum{1}\hlstd{)} \hlopt{*} \hlstd{Linf1} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K1} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t01)))} \hlopt{+}
+                   \hlstd{(period} \hlopt{==} \hlnum{2}\hlstd{)} \hlopt{*} \hlstd{Linf2} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K2} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t02)))} \hlopt{+}
+                   \hlstd{(period} \hlopt{==} \hlnum{3}\hlstd{)} \hlopt{*} \hlstd{Linf3} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K3} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t03))),}
+          \hlkwc{start} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{Linf1} \hlstd{= Linf,} \hlkwc{Linf2} \hlstd{= Linf,} \hlkwc{Linf3} \hlstd{= Linf,}
+                       \hlkwc{K1} \hlstd{= K,} \hlkwc{K2} \hlstd{= K,} \hlkwc{K3} \hlstd{= K,}
+                       \hlkwc{t01} \hlstd{= t0,} \hlkwc{t02} \hlstd{= t0,} \hlkwc{t03} \hlstd{= t0),}
+          \hlkwc{data} \hlstd{= walleye)}
+\hlcom{## c3 same Linf}
+\hlstd{c3} \hlkwb{<-} \hlkwd{nls}\hlstd{(length} \hlopt{~} \hlstd{(period} \hlopt{==} \hlnum{1}\hlstd{)} \hlopt{*} \hlstd{Linf} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K1} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t01)))} \hlopt{+}
+                   \hlstd{(period} \hlopt{==} \hlnum{2}\hlstd{)} \hlopt{*} \hlstd{Linf} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K2} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t02)))} \hlopt{+}
+                   \hlstd{(period} \hlopt{==} \hlnum{3}\hlstd{)} \hlopt{*} \hlstd{Linf} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K3} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t03))),}
+          \hlkwc{start} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{Linf} \hlstd{= Linf,}
+                       \hlkwc{K1} \hlstd{= K,} \hlkwc{K2} \hlstd{= K,} \hlkwc{K3} \hlstd{= K,}
+                       \hlkwc{t01} \hlstd{= t0,} \hlkwc{t02} \hlstd{= t0,} \hlkwc{t03} \hlstd{= t0),}
+          \hlkwc{data} \hlstd{= walleye)}
+\hlcom{## c4 same K}
+\hlstd{c4} \hlkwb{<-} \hlkwd{nls}\hlstd{(length} \hlopt{~} \hlstd{(period} \hlopt{==} \hlnum{1}\hlstd{)} \hlopt{*} \hlstd{Linf1} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t01)))} \hlopt{+}
+                   \hlstd{(period} \hlopt{==} \hlnum{2}\hlstd{)} \hlopt{*} \hlstd{Linf2} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t02)))} \hlopt{+}
+                   \hlstd{(period} \hlopt{==} \hlnum{3}\hlstd{)} \hlopt{*} \hlstd{Linf3} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t03))),}
+          \hlkwc{start} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{Linf1} \hlstd{= Linf,} \hlkwc{Linf2} \hlstd{= Linf,} \hlkwc{Linf3} \hlstd{= Linf,}
+                       \hlkwc{K} \hlstd{= K,}
+                       \hlkwc{t01} \hlstd{= t0,} \hlkwc{t02} \hlstd{= t0,} \hlkwc{t03} \hlstd{= t0),}
+          \hlkwc{data} \hlstd{= walleye)}
+\hlcom{## c5 same t0}
+\hlstd{c5} \hlkwb{<-} \hlkwd{nls}\hlstd{(length} \hlopt{~} \hlstd{(period} \hlopt{==} \hlnum{1}\hlstd{)} \hlopt{*} \hlstd{Linf1} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K1} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t0)))} \hlopt{+}
+                   \hlstd{(period} \hlopt{==} \hlnum{2}\hlstd{)} \hlopt{*} \hlstd{Linf2} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K2} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t0)))} \hlopt{+}
+                   \hlstd{(period} \hlopt{==} \hlnum{3}\hlstd{)} \hlopt{*} \hlstd{Linf3} \hlopt{*} \hlstd{(}\hlnum{1} \hlopt{-} \hlkwd{exp}\hlstd{(} \hlopt{-} \hlstd{K3} \hlopt{*} \hlstd{(age} \hlopt{-} \hlstd{t0))),}
+          \hlkwc{start} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{Linf1} \hlstd{= Linf,} \hlkwc{Linf2} \hlstd{= Linf,} \hlkwc{Linf3} \hlstd{= Linf,}
+                       \hlkwc{K1} \hlstd{= K,} \hlkwc{K2} \hlstd{= K,} \hlkwc{K3} \hlstd{= K,}
+                       \hlkwc{t0} \hlstd{= t0),}
+          \hlkwc{data} \hlstd{= walleye)}
+
+\hlcom{## Anova}
+\hlkwd{anova}\hlstd{(c1, c3, c2)}
+\end{alltt}
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: length ~ Linf * (1 - exp(-K * (age - t0)))
+## Model 2: length ~ (period == 1) * Linf * (1 - exp(-K1 * (age - t01))) + (period == 2) * Linf * (1 - exp(-K2 * (age - t02))) + (period == 3) * Linf * (1 - exp(-K3 * (age - t03)))
+## Model 3: length ~ (period == 1) * Linf1 * (1 - exp(-K1 * (age - t01))) + (period == 2) * Linf2 * (1 - exp(-K2 * (age - t02))) + (period == 3) * Linf3 * (1 - exp(-K3 * (age - t03)))
+##   Res.Df Res.Sum Sq Df Sum Sq F value    Pr(>F)    
+## 1   3195    2211448                                
+## 2   3191    1994577  4 216871  86.740 < 2.2e-16 ***
+## 3   3189    1963513  2  31064  25.226  1.35e-11 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+\begin{alltt}
+\hlkwd{anova}\hlstd{(c1, c4, c2)}
+\end{alltt}
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: length ~ Linf * (1 - exp(-K * (age - t0)))
+## Model 2: length ~ (period == 1) * Linf1 * (1 - exp(-K * (age - t01))) + (period == 2) * Linf2 * (1 - exp(-K * (age - t02))) + (period == 3) * Linf3 * (1 - exp(-K * (age - t03)))
+## Model 3: length ~ (period == 1) * Linf1 * (1 - exp(-K1 * (age - t01))) + (period == 2) * Linf2 * (1 - exp(-K2 * (age - t02))) + (period == 3) * Linf3 * (1 - exp(-K3 * (age - t03)))
+##   Res.Df Res.Sum Sq Df Sum Sq F value    Pr(>F)    
+## 1   3195    2211448                                
+## 2   3191    2014863  4 196585  77.834 < 2.2e-16 ***
+## 3   3189    1963513  2  51350  41.700 < 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+\begin{alltt}
+\hlkwd{anova}\hlstd{(c1, c5, c2)}
+\end{alltt}
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: length ~ Linf * (1 - exp(-K * (age - t0)))
+## Model 2: length ~ (period == 1) * Linf1 * (1 - exp(-K1 * (age - t0))) + (period == 2) * Linf2 * (1 - exp(-K2 * (age - t0))) + (period == 3) * Linf3 * (1 - exp(-K3 * (age - t0)))
+## Model 3: length ~ (period == 1) * Linf1 * (1 - exp(-K1 * (age - t01))) + (period == 2) * Linf2 * (1 - exp(-K2 * (age - t02))) + (period == 3) * Linf3 * (1 - exp(-K3 * (age - t03)))
+##   Res.Df Res.Sum Sq Df Sum Sq F value    Pr(>F)    
+## 1   3195    2211448                                
+## 2   3191    1989989  4 221458  88.779 < 2.2e-16 ***
+## 3   3189    1963513  2  26476  21.500 5.307e-10 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+As we can see, three ANOVA tables above show that all the tests on difference are significant, suggesting that all three parameters should be different for each period of time, and we should accept the most complex model \m{c2}. However, since the sample size is too large, statistical significance may not be equivalent to practical significance.
+
+\problem{2}
+
+Analyze the Boston Housing Data. The data set (named Boston) is available in the package MASS. The response is median value of owner-occupied homes (the last variable in the data set). You may restrict your attention to linear models. Please consider the following methods: full model, all subset selection based on AIC, all subset selection based on BIC, Lasso, and ridge regression. 
+
+Use half-half CV to compare their performances. 
+
+\solution
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{require}\hlstd{(sampling)}
+\hlkwd{require}\hlstd{(MASS)}
+\hlkwd{require}\hlstd{(glmnet)}
+\hlkwd{require}\hlstd{(lars)}
+\hlkwd{require}\hlstd{(leaps)}
+
+\hlkwd{rm}\hlstd{(}\hlkwc{list} \hlstd{=} \hlkwd{ls}\hlstd{())}
+
+\hlkwd{data}\hlstd{(Boston)}
+\hlstd{n} \hlkwb{<-} \hlkwd{nrow}\hlstd{(Boston)}
+\hlstd{p} \hlkwb{<-} \hlkwd{ncol}\hlstd{(Boston)}
+\hlstd{X} \hlkwb{<-} \hlkwd{as.matrix}\hlstd{(Boston[,} \hlnum{1} \hlopt{:} \hlstd{(p} \hlopt{-} \hlnum{1}\hlstd{)])}
+\hlstd{y} \hlkwb{<-} \hlstd{Boston}\hlopt{$}\hlstd{medv}
+
+\hlkwd{set.seed}\hlstd{(}\hlnum{123123}\hlstd{)}
+\hlstd{index} \hlkwb{<-} \hlkwd{as.logical}\hlstd{(}\hlkwd{srswor}\hlstd{(n} \hlopt{/} \hlnum{2}\hlstd{, n))}
+\hlstd{index_1} \hlkwb{<-} \hlkwd{as.logical}\hlstd{(}\hlnum{1} \hlopt{-} \hlstd{index)}
+\hlstd{index} \hlkwb{<-} \hlkwd{list}\hlstd{(index, index_1)}
+
+\hlstd{error} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlkwc{nrow} \hlstd{=} \hlnum{5}\hlstd{,} \hlkwc{ncol} \hlstd{=} \hlnum{2}\hlstd{)}
+
+\hlcom{## Half Half CV}
+\hlkwa{for} \hlstd{(i} \hlkwa{in} \hlnum{1} \hlopt{:} \hlnum{2}\hlstd{)}
+\hlstd{\{}
+    \hlstd{data_train} \hlkwb{<-} \hlstd{Boston[index[[i]], ]}
+    \hlstd{data_test} \hlkwb{<-} \hlstd{Boston[index[[}\hlnum{3} \hlopt{-} \hlstd{i]], ]}
+
+    \hlstd{X_train} \hlkwb{<-} \hlstd{data_train[,} \hlnum{1} \hlopt{:} \hlstd{(p} \hlopt{-} \hlnum{1}\hlstd{)]}
+    \hlstd{y_train} \hlkwb{<-} \hlstd{data_train[, p]}
+    \hlstd{X_test} \hlkwb{<-} \hlstd{data_test[,} \hlnum{1} \hlopt{:} \hlstd{(p} \hlopt{-} \hlnum{1}\hlstd{)]}
+    \hlstd{y_test} \hlkwb{<-} \hlstd{data_test[, p]}
+    \hlstd{n} \hlkwb{<-} \hlkwd{nrow}\hlstd{(X_train)}
+    \hlstd{p} \hlkwb{<-} \hlkwd{ncol}\hlstd{(X_train)} \hlopt{+} \hlnum{1}
+
+    \hlcom{## Full model}
+    \hlstd{m_full} \hlkwb{<-} \hlkwd{lm}\hlstd{(medv} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= data_train)}
+    \hlstd{y_pred} \hlkwb{<-} \hlkwd{predict}\hlstd{(}\hlkwc{object} \hlstd{= m_full,} \hlkwc{newdata} \hlstd{= X_test)}
+    \hlstd{error[}\hlnum{1}\hlstd{, i]} \hlkwb{<-} \hlkwd{mean}\hlstd{((y_pred} \hlopt{-} \hlstd{y_test)} \hlopt{^} \hlnum{2}\hlstd{)}
+
+    \hlkwd{cbind}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwd{as.matrix}\hlstd{(X_test))} \hlopt{%*%} \hlkwd{as.matrix}\hlstd{(}\hlkwd{coef}\hlstd{(m_full))}
+
+    \hlcom{## All Subset}
+    \hlstd{outs} \hlkwb{<-} \hlkwd{summary}\hlstd{(}\hlkwd{regsubsets}\hlstd{(}\hlkwc{x} \hlstd{= X_train,} \hlkwc{y} \hlstd{= y_train,}
+                               \hlkwc{nvmax} \hlstd{= p,} \hlkwc{method} \hlstd{=} \hlstr{"exhaustive"}\hlstd{))}
+    \hlstd{RSS} \hlkwb{<-} \hlstd{outs}\hlopt{$}\hlstd{rss}
+
+    \hlstd{AIC} \hlkwb{<-} \hlstd{n} \hlopt{*} \hlkwd{log}\hlstd{(RSS} \hlopt{/} \hlstd{(n))} \hlopt{+} \hlnum{2} \hlopt{*} \hlstd{(}\hlkwd{apply}\hlstd{(outs}\hlopt{$}\hlstd{which,} \hlnum{1}\hlstd{, sum))}
+    \hlstd{BIC} \hlkwb{<-} \hlstd{n} \hlopt{*} \hlkwd{log}\hlstd{(RSS} \hlopt{/} \hlstd{(n))} \hlopt{+} \hlkwd{log}\hlstd{(n)} \hlopt{*} \hlstd{(}\hlkwd{apply}\hlstd{(outs}\hlopt{$}\hlstd{which,} \hlnum{1}\hlstd{, sum))}
+    \hlstd{ix_AIC} \hlkwb{<-} \hlkwd{which.min}\hlstd{(AIC)}
+    \hlstd{ix_BIC} \hlkwb{<-} \hlkwd{which.min}\hlstd{(BIC)}
+    \hlstd{x_AIC} \hlkwb{<-} \hlstd{X_train[, outs}\hlopt{$}\hlstd{which[ix_AIC,} \hlopt{-}\hlnum{1}\hlstd{]]}
+    \hlstd{x_BIC} \hlkwb{<-} \hlstd{X_train[, outs}\hlopt{$}\hlstd{which[ix_BIC,} \hlopt{-}\hlnum{1}\hlstd{]]}
+    \hlstd{data_AIC} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(x_AIC,} \hlkwc{medv} \hlstd{= y_train)}
+    \hlstd{data_BIC} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(x_BIC,} \hlkwc{medv} \hlstd{= y_train)}
+    \hlstd{m_AIC} \hlkwb{<-} \hlkwd{lm}\hlstd{(medv} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= data_AIC)}
+    \hlstd{m_BIC} \hlkwb{<-} \hlkwd{lm}\hlstd{(medv} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= data_BIC)}
+    \hlstd{y_pred} \hlkwb{<-} \hlkwd{predict}\hlstd{(}\hlkwc{object} \hlstd{= m_AIC,} \hlkwc{newdata} \hlstd{=} \hlkwd{data.frame}\hlstd{(X_test))}
+    \hlstd{error[}\hlnum{2}\hlstd{, i]} \hlkwb{<-} \hlkwd{mean}\hlstd{((y_pred} \hlopt{-} \hlstd{y_test)} \hlopt{^} \hlnum{2}\hlstd{)}
+    \hlstd{y_pred} \hlkwb{<-} \hlkwd{predict}\hlstd{(}\hlkwc{object} \hlstd{= m_BIC,} \hlkwc{newdata} \hlstd{=} \hlkwd{data.frame}\hlstd{(X_test))}
+    \hlstd{error[}\hlnum{3}\hlstd{, i]} \hlkwb{<-} \hlkwd{mean}\hlstd{((y_pred} \hlopt{-} \hlstd{y_test)} \hlopt{^} \hlnum{2}\hlstd{)}
+
+    \hlcom{## Lasso}
+    \hlstd{m_lasso} \hlkwb{<-} \hlkwd{lars}\hlstd{(}\hlkwc{x} \hlstd{=} \hlkwd{as.matrix}\hlstd{(X_train),} \hlkwc{y} \hlstd{= y_train,} \hlkwc{type} \hlstd{=} \hlstr{"lasso"}\hlstd{)}
+    \hlstd{foo} \hlkwb{<-} \hlkwd{summary}\hlstd{(m_lasso)}
+    \hlstd{RSS} \hlkwb{<-} \hlstd{foo}\hlopt{$}\hlstd{Rss}
+    \hlstd{BIC} \hlkwb{<-} \hlstd{n} \hlopt{*} \hlkwd{log}\hlstd{(RSS} \hlopt{/} \hlstd{n)} \hlopt{+} \hlkwd{log}\hlstd{(n)} \hlopt{*} \hlstd{foo}\hlopt{$}\hlstd{Df}
+    \hlstd{ix_BIC} \hlkwb{<-} \hlkwd{which.min}\hlstd{(BIC)}
+    \hlstd{y_pred} \hlkwb{<-} \hlkwd{predict}\hlstd{(}\hlkwc{object} \hlstd{= m_lasso,} \hlkwc{newx} \hlstd{=} \hlkwd{as.matrix}\hlstd{(X_test),} \hlkwc{s} \hlstd{= ix_BIC)}
+    \hlstd{error[}\hlnum{4}\hlstd{, i]} \hlkwb{<-} \hlkwd{mean}\hlstd{((y_pred}\hlopt{$}\hlstd{fit} \hlopt{-} \hlstd{y_test)} \hlopt{^} \hlnum{2}\hlstd{)}
+
+    \hlcom{## ridge}
+    \hlstd{m_ridge} \hlkwb{<-} \hlkwd{glmnet}\hlstd{(}\hlkwd{as.matrix}\hlstd{(X_train), y_train,}
+                      \hlkwc{family} \hlstd{=} \hlstr{"gaussian"}\hlstd{,} \hlkwc{alpha} \hlstd{=} \hlnum{0}\hlstd{,}
+                      \hlkwc{intercept}\hlstd{=}\hlnum{TRUE}\hlstd{,} \hlkwc{lambda} \hlstd{=} \hlkwd{seq}\hlstd{(}\hlnum{10}\hlstd{,} \hlnum{0.01}\hlstd{,} \hlopt{-}\hlnum{0.01}\hlstd{),}
+                      \hlkwc{standardize} \hlstd{=} \hlnum{FALSE}\hlstd{)}
+    \hlstd{tmp} \hlkwb{<-} \hlkwd{predict}\hlstd{(m_ridge,} \hlkwc{newx} \hlstd{=} \hlkwd{as.matrix}\hlstd{(X_train))}
+    \hlstd{foo} \hlkwb{<-} \hlstd{tmp} \hlopt{-} \hlkwd{as.matrix}\hlstd{(y_train)} \hlopt{%*%} \hlkwd{matrix}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwc{nrow} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{ncol} \hlstd{=} \hlkwd{ncol}\hlstd{(tmp))}
+    \hlstd{k} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) \{}\hlkwd{sum}\hlstd{(x} \hlopt{^} \hlnum{2}\hlstd{)\}}
+    \hlstd{RSS} \hlkwb{<-} \hlkwd{apply}\hlstd{(foo,} \hlnum{2}\hlstd{, k)}
+    \hlstd{BIC} \hlkwb{<-} \hlstd{n} \hlopt{*} \hlkwd{log}\hlstd{(RSS} \hlopt{/} \hlstd{n)} \hlopt{+} \hlkwd{log}\hlstd{(n)} \hlopt{*} \hlstd{(m_ridge}\hlopt{$}\hlstd{df} \hlopt{+} \hlnum{1}\hlstd{)}
+    \hlstd{ix_BIC} \hlkwb{<-} \hlkwd{which.min}\hlstd{(BIC)}
+    \hlstd{y_pred} \hlkwb{<-} \hlkwd{predict}\hlstd{(m_ridge,} \hlkwc{newx} \hlstd{=} \hlkwd{as.matrix}\hlstd{(X_test),} \hlkwc{s} \hlstd{= m_ridge}\hlopt{$}\hlstd{lambda[ix_BIC])}
+    \hlstd{error[}\hlnum{5}\hlstd{, i]} \hlkwb{<-} \hlkwd{mean}\hlstd{((y_pred} \hlopt{-} \hlstd{y_test)} \hlopt{^} \hlnum{2}\hlstd{)}
+\hlstd{\}}
+
+\hlkwd{rownames}\hlstd{(error)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"Full Model"}\hlstd{,} \hlstr{"All Subset AIC"}\hlstd{,}
+                     \hlstr{"All Subset BIC"}\hlstd{,} \hlstr{"Lasso BIC"}\hlstd{,}
+                     \hlstr{"Ridge BIC"}\hlstd{)}
+\hlkwd{colnames}\hlstd{(error)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"CV1"}\hlstd{,} \hlstr{"CV2"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+Here we use half-half CV to compare their performances. Since only the best linear model without polynomial terms will be considered, it is reasonable to assume that this problem is in a kind of parametric senario, hence we apply BIC to tune parameters for Lasso and Ridge regression. we report the CV result as an error matrix in table \ref{error matrix}.
+
+\begin{table}[ht!]
+\centering
+\caption{Error Matrix for Half-half CV}
+\begin{tabular}{lcc}
+\toprule
+ \multicolumn{1}{c}{  } & \multicolumn{1}{c}{ CV1 } & \multicolumn{1}{c}{ CV2 } \\
+\midrule
+ Full Model & $25.83$ & $25.05$ \\
+ All Subset AIC & $25.89$ & $24.14$ \\
+ All Subset BIC & $26.53$ & $24.76$ \\
+ Lasso BIC & $25.81$ & $24.69$ \\
+ Ridge BIC & $25.90$ & $25.12$ \\
+\bottomrule
+\end{tabular}
+\label{error matrix}
+\end{table}
+
+As we can see in table \ref{error matrix}, the overall prediction error for each model is almost the same, \textbf{therefore it is hard to determine which modelling strategy is the best.} The reason of similar preditcion capability lies in the fact that \textbf{all the linear models are underfitted.} When we try to tune parameters for the ridge model, the lambda selected by BIC is very close to 0, suggesting that there is no need to introduce penalty on this problem, which means models of linear form is underfitted. Since we still have enough degrees of freedom to play, we can involve some polynomial terms into the model to achieve better generealziation power.
+
+\end{document}
