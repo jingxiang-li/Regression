@@ -277,7 +277,7 @@ rownames(error) <- c("Full Model", "All Subset AIC",
 colnames(error) <- c("CV1", "CV2")
 @
 
-Here we use half-half CV to compare their performances. Since only the best linear model without polynomial terms will be considered, it is reasonable to assume that this problem is in a kind of parametric senario, hence we apply BIC to tune parameters for Lasso and Ridge regression. we report the CV result as an error matrix in table \ref{error matrix}.
+Here we use half-half CV to compare their performances. Since only the best linear model without polynomial terms will be considered, it is reasonable to assume that this problem is in a kind of parametric scenario, hence we apply BIC to tune parameters for Lasso and Ridge regression. we report the CV result as an error matrix in table \ref{error matrix}.
 
 \begin{table}[ht!]
 \centering
@@ -296,6 +296,6 @@ Here we use half-half CV to compare their performances. Since only the best line
 \label{error matrix}
 \end{table}
 
-As we can see in table \ref{error matrix}, the overall prediction error for each model is almost the same, \textbf{therefore it is hard to determine which modelling strategy is the best.} The reason of similar preditcion capability lies in the fact that \textbf{all the linear models are underfitted.} When we try to tune parameters for the ridge model, the lambda selected by BIC is very close to 0, suggesting that there is no need to introduce penalty on this problem, which means models of linear form is underfitted. Since we still have enough degrees of freedom to play, we can involve some polynomial terms into the model to achieve better generealziation power.
+As we can see in table \ref{error matrix}, the overall prediction error for each model is almost the same, \textbf{therefore it is hard to determine which modelling strategy is the best.} The reason of similar prediction capability lies in the fact that \textbf{all the linear models are underfitted.} When we try to tune parameters for the ridge model, the lambda selected by BIC is very close to 0, suggesting that there is no need to introduce penalty on this problem, which means models of linear form is underfitted. Since we still have enough degrees of freedom to play, we can involve some polynomial terms into the model to achieve better generalization power.
 
 \end{document}
