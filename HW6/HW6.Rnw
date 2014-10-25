@@ -1,0 +1,227 @@
+%!TEX program = xelatex
+%# -*- coding: utf-8 -*-
+%!TEX encoding = UTF-8 Unicode
+
+\documentclass[12pt,oneside,a4paper]{article}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2cm,bmargin=2cm,lmargin=2cm,rmargin=2cm}
+\usepackage[pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=2,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\hypersetup{pdfstartview={XYZ null null 1}}
+\usepackage{url}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{microtype}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage[retainorgcmds]{IEEEtrantools}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}} 
+\renewcommand{\algorithmicensure}{\textbf{Output:}} 
+
+\usepackage[sc]{mathpazo}
+\linespread{1.1}
+\usepackage[T1]{fontenc}
+
+
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage[figure]{hypcap}
+\usepackage[hypcap]{caption}
+\usepackage{tikz}
+%\usepackage{grffile} 
+%\usepackage{float} 
+\usepackage{pdfpages}
+
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+
+%\usepackage[square,numbers,super,comma,sort]{natbib}
+%\usepackage[backend=biber, style=nature, sorting=none, isbn=false, url=false, doi=false]{biblatex}
+%\addbibresource{ref.bib}
+%\usepackage[]{authblk}
+
+\usepackage{verbatim}
+
+\newcommand{\problem}[1]
+{
+    \clearpage
+    \section*{Problem {#1}}
+}
+
+\newcommand{\subproblem}[1]
+{
+    \subsection*{Problem {#1}}
+}
+
+
+\newcommand{\solution}
+{
+    \vspace{15pt}
+    \noindent\ignorespaces\textbf{\large Solution}\par
+}
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\lhead{\hmwkAuthorName}
+\chead{\hmwkTitle}
+\rhead{\firstxmark}
+\cfoot{\thepage}
+
+\newcommand{\hmwkTitle}{STAT 8051 HW 6}
+\newcommand{\hmwkAuthorName}{Jingxiang Li}
+
+\setlength\headheight{15pt}
+\setlength\parindent{0pt}
+\setlength{\parskip}{0.5em}
+
+\newcommand{\m}[1]{\texttt{{#1}}}
+
+
+\pagestyle{fancy}
+
+\title{\hmwkTitle}
+\author{\hmwkAuthorName}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+<<setup, include=FALSE, cache=FALSE>>=
+# set global chunk options
+opts_chunk$set(fig.path='figure/', fig.align='center', fig.show='hold', tidy=FALSE, tidy.opts=list(keep.blank.line=TRUE, width.cutoff=50), warning=FALSE, error=FALSE, message=FALSE, echo=TRUE)
+#, sanitize=TRUE, dev="tikz")
+options(replace.assign=TRUE,width=90)
+knit_theme$set("edit-eclipse")
+knit_hooks$set(document = function(x) { 
+  sub('\\usepackage[]{color}', '\\usepackage[]{xcolor}', x, fixed = TRUE) 
+}) 
+@
+
+\problem{12.5}
+\emph{Donner party} (Data file: \m{Donner}) In the winter of 1846–1847, about 90 wagon train emigrants in the Donner party were unable to cross the Sierra Nevada Mountains of California before winter, and almost half of them starved to death. The data in file Donner from Johnson (1996) include some information about each of the members of the party. The variables include \m{age}, the age of the person; \m{sex}, whether male or female; \m{status}, whether the person was a member of a family group, a hired worker for one of the family groups, or a single individual who did not appear to be a hired worker or a member of any of the larger family groups; and \m{y}, a factor with levels died and survived.
+
+\subproblem{12.5.1}
+How many men and women were in the Donner Party? What was the survival rate for each sex? Obtain a test that the survival rates were the same against the alternative that they were different. What do you conclude?
+
+\solution
+<<p1251>>=
+require(alr4)
+data <- na.omit(Donner)
+summary(data$sex)
+@
+
+As the result, there are 53 men and 35 women included in the Donner Party.
+
+<<p12512>>=
+tb_yVsSex <- table(data$sex, data$y)
+prop.table(tb_yVsSex, 1)
+@
+
+As we can see, the survival rate is 71.4\% for female, and 45.3\% for male.
+
+<<p12513>>=
+chisq.test(tb_yVsSex, correct = FALSE)
+@
+
+Note that to test whether survival rates are the same for each sex is equivalent to test whether survival record and sex are independent, given the contingency table above. Hence we can apply $\chi^{2}$ test to the contingency table of \m{y} against \m{sex}. As the result, we have a p-value 0.01567, suggesting that we have enough evidence to reject the hypothesis that survival rates are the same for each sex, which means that survival rates are different for each sex.
+
+\subproblem{12.5.2}
+Fit the logistic regression model $\m{y} \sim \m{age}$, and provide an interpretation for the fitted coefficient for \m{age}.
+
+\solution
+<<p1252>>=
+m1 <- glm(y ~ age, data = data, family = binomial())
+summary(m1)
+@
+
+Note that \m{m1} is the logistic regression model $\m{y} \sim \m{age}$, and we see the estimated coefficient for \m{age} is $-0.03689$ with p-value 0.01346, suggesting that we have enough evidence to reject the hypothesis that it is zero. Since logit link function is used, we have 
+$$\frac{p(x)}{1 - p(x)} = \mathrm{exp}(\beta^{'}x)$$
+So that 1 unit increase in \m{age} will result in 0.03689 decrease in $log(\frac{p(x)}{1 - p(x)})$. In another word, if \m{age} increase by 1 unit, the odds of survival will decrease by about 1.3\%.
+
+\subproblem{12.5.3}
+Use your computer package to draw a scatterplot of the Pearson residuals from the model fit in Section 12.5 versus \m{age}. The residual plot will consist of two curves, with the curve of all positive values corresponding to survivors and the negative curve for deaths. As in Chapter 9, residual plots can be used to diagnose curvature, but this is quite hard without the aid of a smoother added to the plot.
+
+\solution
+<<p1253, fig.width=8, fig.height=4.5, out.width='.8\\linewidth'>>=
+require(ggplot2)
+foo <- data.frame(age = data$age, residuals = m1$residuals, survival = data$y)
+p <- ggplot(data = foo)
+p <- p + geom_point(aes(x = age, y = residuals, shape = survival), size = 2)
+p <- p + theme_bw() + theme(text = element_text(size = 14))
+p <- p + ggtitle("Residuals VS Age")
+p
+@
+
+As we can see in the graph above, it's hard to say that the conditional variance of residuals given \m{age} is constant. In addition, the pattern of residuals against each \m{age} seems to suggest that there exists a nonlinear relationship between \m{y} and \m{age}, maybe we should include a polynomial term of \m{age} into the model.
+
+\subproblem{12.5.4}
+Fit the logistic regression model $\m{y} \sim \m{age} + \m{age} ^ 2 + \m{sex} + \m{status}$ and summarize results
+\solution
+<<p1254>>=
+m2 <- update(m1, ~ age + I(age^2) + sex + status)
+summary(m2)
+@
+
+Here we see the quadratic term of \m{age} is negative, suggesting that people with very small or very large age were more likely to die, and people about 22 years old had the maximized likelihood to survive. Then the coefficient for sex is negative, suggesting that women were more likely to survive than men. Lastly, the coefficients of \m{stautsHired} and \m{statusSingle} suggests that the person who was a member of a family group is more likely to survive, and the single individual who did not appear to be a hired worker or a member of any of the larger family groups is more likely to die.
+
+\problem{12.6}
+\emph{Challenger} (Data file: \m{Challeng}) These data from Dalal et al. (1989) records performance of O-rings for the 23 U.S. space shuttle missions prior to the Challenger disaster of January 20, 1986. For each of the previous missions, the temperature at takeoff and the pressure of a prelaunch test were recorded, along with the number of O-rings that failed out of 6.
+
+Use these data to try to understand the probability of failure as a function of temperature, and of temperature and pressure. Use your fitted model to estimate the probability of failure of an O-ring when the temperature was $31^{\circ}F$, the launch temperature on January 20, 1986.
+
+\solution
+<<p126>>=
+data <- Challeng
+m1 <- glm(cbind(fail, 6 - fail) ~ temp, family = binomial, data = data)
+m2 <- update(m1, ~ temp + pres)
+anova(m1, m2, test="Chisq")
+
+foo <- data.frame(temp = 31)
+tmp <- predict(m1, newdata = foo)
+exp(tmp) / (1 + exp(tmp))
+@
+
+Here we establish two logistic regression models \m{m1} and \m{m2}, where \m{m1} has temperature as the only regressor, \m{m2} has temperature and pressure as regressors. Then we compare these two models by $\chi^{2}$ test. The resulting p-value derived from $\chi^{2}$ test suggests that there is no significant difference between these two models, hence we choose the smaller one \m{m1}. 
+
+Then we make prediction about failure probability by \m{m1}, given temperature as $31^{\circ}F$, the resulting predicted probability is 81.7\%.
+
+\problem{12.7}
+\emph{Titanic} (Data file: \m{Whitestar}) The Titanic was a British luxury passenger liner that sank when it struck an iceberg about 640 km south of Newfoundland on April 14–15, 1912, on its maiden voyage to New York City from Southampton, England. Of 2201 known passengers and crew, only 711 are reported to have survived. These data from Dawson (1995) classify the people on board the ship according to their \m{sex} as male or female; \m{age}, either child or adult; and \m{class}, either first, second, third, or crew. Not all combinations of the three-factors occur in the data, since no children were members of the crew. For each age/sex/class combination, the number of people \m{m} and the number surviving \m{Surv} are also reported. The data are shown in Table 12.8.
+
+\subproblem{12.7.1}
+Fit a logistic regression model with terms for factors \m{sex}, \m{age}, and \m{class}. On the basis of examination of the data in Table 12.8, explain why you expect that this mean function will be inadequate to explain these data.
+
+\solution
+<<p1271>>=
+data <- Whitestar
+m1 <- glm(cbind(surv, m - surv) ~ class + age + sex, 
+          data = data, family = binomial)
+summary(m1)
+@
+
+From Table 12.8 we can see that almost all females survived, except for those in the third class, where over half of the women died. This suggests that at least there should be an interaction between \m{sex} and \m{class}.
+
+\subproblem{12.7.2}
+Fit a logistic regression model that includes all the terms of the last part, plus all the two-factor interactions. Use appropriate testing procedures to decide if any of the two-factor interactions can be eliminated. Assuming that the mean function you have obtained matches the data well, summarize the results you have obtained by interpreting the parameters to describe different survival rates for various factor combinations. (Hint: How does the survival of the crew differ from the passengers? First class from third class? Males from females? Children versus adults? Did children in first class survive more often than children in third class?)
+
+\solution
+<<p1272>>=
+m2 <- update(m1, ~ (class + age + sex) ^ 2)
+Anova(m2)
+@
+
+First we use Anova to see the significance of each main effects and interactions. As the result, it seems that the interaction between \m{age} and \m{sex} is not significant, suggesting that there might be no interaction between these two predictors. Then let's see the coefficients for this model.
+
+<<p1273>>=
+summary(m2)
+@
+
+As the result, we can see that people in the first class are more likely to survive than crews, and the crews' likelihood of surviving are almost the same as second class people's likelihood, people in the third class are the most poor ones with the lowest likelihood of surviving. Females are more likely to survive than males in general, but in the third class males' likelihood of surviving is more than females'. There is no evidence showing that children are more likely to survive than adults. Then Children in the first class survive more often than children in the third class. 
+\end{document}
