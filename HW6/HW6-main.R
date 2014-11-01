@@ -42,8 +42,8 @@ m3 <- update(m2, ~ sex + status)
 # 12.6 --------------------------------------------------------------------
 
 data <- Challeng
-m1 <- glm(cbind(fail, 6 - fail) ~ temp, family = binomial, data = data)
-m2 <- glm(cbind(fail, 6 - fail) ~ temp + pres, family = binomial, data = data)
+m1 <- glm(cbind(fail, n - fail) ~ temp, family = binomial, data = data)
+m2 <- glm(cbind(fail, n - fail) ~ temp + pres, family = binomial, data = data)
 anova(m1, m2, test="Chisq")
 
 foo <- data.frame(temp = 31)
@@ -52,6 +52,8 @@ exp(tmp) / (1 + exp(tmp))
 
 ilogit(tmp)
 
+data <- Challeng
+cbind(data[sort(Challeng[,1], index.return = TRUE)$ix, c(1,3)], orings)
 
 # 12.7 --------------------------------------------------------------------
 

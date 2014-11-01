@@ -163,6 +163,7 @@ As we can see in the graph above, it's hard to say that the conditional variance
 
 \subproblem{12.5.4}
 Fit the logistic regression model $\m{y} \sim \m{age} + \m{age} ^ 2 + \m{sex} + \m{status}$ and summarize results
+
 \solution
 <<p1254>>=
 m2 <- update(m1, ~ age + I(age^2) + sex + status)

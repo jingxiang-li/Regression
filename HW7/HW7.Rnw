@@ -1,0 +1,340 @@
+%!TEX program = xelatex
+%# -*- coding: utf-8 -*-
+%!TEX encoding = UTF-8 Unicode
+
+\documentclass[12pt,oneside,a4paper]{article}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2cm,bmargin=2cm,lmargin=2cm,rmargin=2cm}
+\usepackage[pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=2,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\hypersetup{pdfstartview={XYZ null null 1}}
+\usepackage{url}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{microtype}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage[retainorgcmds]{IEEEtrantools}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}} 
+\renewcommand{\algorithmicensure}{\textbf{Output:}} 
+ 
+\usepackage[sc]{mathpazo}
+\linespread{1.1}
+\usepackage[T1]{fontenc}
+
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage[figure]{hypcap}
+\usepackage[hypcap]{caption}
+\usepackage{tikz}
+%\usepackage{grffile} 
+%\usepackage{float} 
+\usepackage{pdfpages}
+
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+
+%\usepackage[square,numbers,super,comma,sort]{natbib}
+%\usepackage[backend=biber, style=nature, sorting=none, isbn=false, url=false, doi=false]{biblatex}
+%\addbibresource{ref.bib}
+%\usepackage[]{authblk}
+
+\usepackage{verbatim}
+
+\newcommand{\problem}[1]
+{
+    \clearpage
+    \section*{Problem {#1}}
+}
+
+\newcommand{\subproblem}[1]
+{
+    \subsection*{Problem {#1}}
+}
+
+
+\newcommand{\solution}
+{
+    \vspace{15pt}
+    \noindent\ignorespaces\textbf{\large Solution}\par
+}
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\lhead{\hmwkAuthorName}
+\chead{\hmwkTitle}
+\rhead{\firstxmark}
+\cfoot{\thepage}
+
+\newcommand{\hmwkTitle}{STAT 8051 HW 7}
+\newcommand{\hmwkAuthorName}{Jingxiang Li}
+
+\setlength\headheight{15pt}
+\setlength\parindent{0pt}
+\setlength{\parskip}{0.5em}
+
+\newcommand{\m}[1]{\texttt{{#1}}}
+\newcommand{\E}[0]{\mathrm{E}}
+\newcommand{\Var}[0]{\mathrm{Var}}
+
+
+
+
+\pagestyle{fancy}
+
+\title{\hmwkTitle}
+\author{\hmwkAuthorName}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+<<setup, include=FALSE, cache=FALSE>>=
+# set global chunk options
+opts_chunk$set(fig.path='figure/', fig.align='center', fig.show='hold', tidy=FALSE, tidy.opts=list(keep.blank.line=TRUE, width.cutoff=50), warning=FALSE, error=FALSE, message=FALSE, echo=TRUE)
+#, sanitize=TRUE, dev="tikz")
+options(replace.assign=TRUE,width=90)
+knit_theme$set("edit-eclipse")
+knit_hooks$set(document = function(x) { 
+  sub('\\usepackage[]{color}', '\\usepackage[]{xcolor}', x, fixed = TRUE) 
+}) 
+@
+
+\problem{2}
+The dataset \m{wbcd} comes from a study of breast cancer in Wisconsin. There are 681 cases of potentially cancerous tumors of which 238 are actually malignant. Determining whether a tumor is really malignant is traditionally determined by an invasive surgical procedure. The purpose of this study was to determine whether a new procedure called fine needle aspiration, which draws only a small sample of tissue, could be effective in determining tumor status.
+
+\subproblem{2.a}
+Fit a binomial regression with Class as the response and the other nine variables as predictors. Report the residual deviance and associated degrees of freedom. Can this information be used to determine if this model fits the data? Explain.
+
+\solution
+<<p2.a>>=
+require(faraway)
+require(MASS)
+data(wbca)
+m1 <- glm(Class ~ ., data = wbca, family = binomial)
+summary(m1)
+@
+
+Here we see that the resulting Residual Deviance is \Sexpr{m1$deviance} with \Sexpr{m1$df.residual} degrees of freedom. 
+
+However we can't use this information to determine if this model is an adequate fit, because in this problem $n_{i} = 1, \forall i$ so that the Deviance does not converge to any distribution. Hence we can't determine if this model fits the data by only using the Residual Deviance and the corresponding degrees of freedom.
+
+\subproblem{2.b}
+Use AIC as the criterion to determine the best subset of variables. (Use the step function.)
+
+\solution
+<<p2.b>>=
+m0 <- glm(Class ~ 1, data = wbca, family = binomial)
+m_AIC <- step(m1, scope = list(lower = m0, upper = m1), 
+     trace = FALSE, k = 2, direction = "both")
+summary(m_AIC)
+@
+
+Here we apply stepwise regression based on AIC to find the best reduced model. The result shows that we remove \m{USize} and \m{Epith} from the full model.
+
+\subproblem{2.c}
+Use the reduced model to predict the outcome for a new patient with predictor variables 1, 1, 3, 2, 1, 1, 4, 1, 1 (same order as above). Give a confidence interval for your prediction.
+
+\solution
+<<p2.c>>=
+newx <- wbca[1, -1]
+newx[1, ] <- c(1, 1, 3, 2, 1, 1, 4, 1, 1)
+foo <- predict(m_AIC, newdata = newx, se.fit = TRUE)
+ConfInterval <- ilogit(c(foo$fit - 1.96 * foo$se.fit, 
+                         foo$fit + 1.96 * foo$se.fit))
+ConfInterval
+@
+
+Note that the confidence interval of prediction for the probability that the new patient is benign is $(\Sexpr{ConfInterval})$, and it should be predicted as benign.
+
+\subproblem{2.d}
+Suppose that a cancer is classified as benign if $p>0.5$ and malignant if $p<0.5$. Compute the number of errors of both types that will be made if this method is applied to the current data with the reduced model.
+
+\solution
+<<p2.d>>=
+cutoff <- 0.5
+m_AIC_pred <- predict(m_AIC, type = "response") > cutoff
+predictive <- factor(as.numeric(m_AIC_pred), labels = c("Malignant", "Benign"))
+actual <- factor(wbca$Class, labels = c("Malignant", "Benign"))
+table(Actual = actual, Predictive = predictive)
+
+prop.table(table(Actual = actual, Predictive = predictive), 1)
+@
+
+Here we construct a confusion matrix for the binomial model. it shows that if we apply the reduced model to the current data, there will be 11 malignant cancers be classified as benign, and 9 benign cancers be classified as malignant. The overall the "prediction" precision is acceptable.
+
+\subproblem{2.e}
+Suppose we change the cutoff to 0.9 so that $p<0.9$ is classified as malignant and $p>0.9$ as benign. Compute the number of errors in this case. Discuss the issues in determining the cutoff.
+
+\solution
+<<p2.e>>=
+cutoff <- 0.9
+m_AIC_pred <- predict(m_AIC, type = "response") > cutoff
+predictive <- factor(as.numeric(m_AIC_pred), labels = c("Malignant", "Benign"))
+actual <- factor(wbca$Class, labels = c("Malignant", "Benign"))
+table(Actual = actual, Predictive = predictive)
+
+prop.table(table(Actual = actual, Predictive = predictive), 1)
+@
+
+Here we change the cutoff value to 0.9 and then redo the prediction based on the new cutoff. The result shows that the number that malignant cancers be classified as benign reduce to 1, but the number that benign cancers be classified as malignant increase to 16.
+
+Note that the difference of the prediction error is caused by the increasing cutoff value. Here we can interpret cutoff value as "How could we believe a cancer is benign based on the prediction made by the model". When we set cutoff value as $0.5$, we believe that when the predictive probability is larger than 0.5, we accept that the cancer is benign; when cutoff value change to $0.9$, it means that only if the predictive probability is larger than 0.9 can we accept that the cancer is benign. It's easy to see that with increasing cutoff value, there will be more benign cancers that are wrongly classified as malignant, and less malignant cancers that are wrongly classified as benign. Hence if the researchers care more about the error that benign cancers wrongly classified as malignant, it is reasonable to set a small cutoff value, otherwise a relatively large cutoff value is more appropriate.
+
+\subproblem{2.f}
+It is usually misleading to use the same data to fit a model and test its predictive ability. To investigate this, split the data into two parts -- assign every third observation to a test set and the remaining two thirds of the data to a training set. Use the training set to determine the model and the test set to assess its predictive performance. Compare the outcome to the previously obtained results.
+
+\solution
+<<p2.f>>=
+ix <- seq(from = 1, to = nrow(wbca), by = 3)
+data_train <- wbca[-ix, ]
+data_test <- wbca[ix, ]
+
+m0 <- glm(Class ~ 1, data = data_train, family = binomial)
+m1 <- glm(Class ~ ., data = data_train, family = binomial)
+
+m_AIC <- step(m1, scope = list(lower = m0, upper = m1), 
+              trace = FALSE, direction = "both")
+
+## Set Cutoff as 0.5
+cutoff <- 0.5
+m_AIC_pred <- predict(m_AIC, newdata = data_test, type = "response") > cutoff
+predictive <- factor(as.numeric(m_AIC_pred), labels = c("Malignant", "Benign"))
+actual <- factor(data_test$Class, labels = c("Malignant", "Benign"))
+table(Actual = actual, Predictive = predictive)
+prop.table(table(Actual = actual, Predictive = predictive), 1)
+
+## Set Cutoff as 0.9
+cutoff <- 0.9
+m_AIC_pred <- predict(m_AIC, newdata = data_test, type = "response") > cutoff
+predictive <- factor(as.numeric(m_AIC_pred), labels = c("Malignant", "Benign"))
+actual <- factor(data_test$Class, labels = c("Malignant", "Benign"))
+table(Actual = actual, Predictive = predictive)
+prop.table(table(Actual = actual, Predictive = predictive), 1)
+@
+
+To compare the predictive performance here with the previously obtained results, we would better look at the "False Benign Rate" and the "False Malignant Rate", where we define "False Benign Rate" as the percentage of malignant cancers that be predicted as benign, and similarly "False Malignant Rate" as the percentage of benign cancers that be predicted as malignant by the model. 
+
+First, we compare two modeling strategies under the 0.5 cutoff. Note that the "False Benign Rate" for two modeling strategies are almost the same, but the "False Malignant Rate" of the current model is higher than the previous result, suggesting that under the 0.5 cutoff, previous result underestimate the "False Malignant Rate".
+
+Then we compare the current result with the previous one under the 0.9 cutoff. Note that the current model's "False Benign Rate" and "False Malignant Rate" are both larger than the previous result, suggesting that under the 0.9 cutoff, previous result underestimate both the "False Benign Rate" and "False Malignant Rate".
+
+\problem{3}
+The National Institute of Diabetes and Digestive and Kidney Diseases conducted a study on 768 adult female Pima Indians living near Phoenix. The purpose of the study was to investigate factors related to diabetes. The data may be found in the the dataset pima.
+
+\subproblem{3.a}
+Perform simple graphical and numerical summaries of the data. Can you find any obvious irregularities in the data? If you do, take appropriate steps to correct the problems.
+
+\solution
+<<p3.a1, fig.width=6, fig.height=9, out.width='1\\linewidth'>>=
+## Mean and Quantiles
+summary(pima)
+@
+
+Here we first try to summarize data by calculating the mean value and quantiles for each variable, and see if there is something weird happens. As the result, we see that there are some cases have 0 \m{bmi}. it's not usual because 0 \m{bmi} suggests 0 weight! Hence it is reasonable to suspect that it might be a missing value but coded as 0. To see whether there are real missing values, we try to draw histogram for each ``suspicious'' variable as follows.
+
+<<p3.a2, fig.width=6, fig.height=9, out.width='1\\linewidth'>>=
+## Histograms
+par(mfrow = c(3, 2))
+    hist(pima$pregnant)
+    hist(pima$glucose)
+    hist(pima$diastolic)
+    hist(pima$triceps)
+    hist(pima$insulin)
+    hist(pima$bmi)
+@
+
+As the result, histogram for \m{glucose}, \m{diastolic} and \m{bmi} all suggests that there are some weird 0 cases, which strongly suggests that they are missing values, and we should remove them.
+
+<<p3.a3>>=
+## remove weird 0's
+data <- pima
+data <- data[data$glucose != 0, ]
+data <- data[data$diastolic != 0, ]
+data <- data[data$bmi != 0, ]
+@
+
+\subproblem{3.b}
+Fit a model with the result of the diabetes test as the response and all the other variables as predictors. Can you tell whether this model fits the data?
+
+\solution
+<<p3.b>>=
+m1 <- glm(test ~ ., data = data, family = binomial)
+summary(m1)
+@
+
+Here we fit the full model \m{m1}. 
+
+It's hard to tell whether this model fits the data or not because in this problem $n_{i} = 1,~ \forall i$, so that the deviance doesn't converge to any distribution, hence we don't have an available statistical test for it.
+
+\subproblem{3.c}
+What is the difference in the odds of testing positive for diabetes for a woman with a BMI at the first quartile compared with a woman at the third quartile, assuming that all other factors are held constant? Give a confidence interval for this difference.
+
+\solution
+Note that the estimated coefficient for \m{bmi} is \Sexpr{m1$coef["bmi"]}, suggesting that a unit increase in \m{bmi} with all other predictors held fixed increases the odds of testing positive for diabetes by 9.89\% in average. Since the difference between the third quartile and the first quartile of \m{bmi} is 9.1, the odds of testing positive for diabetes for a woman with a BMI at the third quartile will be 2.358848 times over a woman at first quartile in average, with all other predictors held fixed.
+
+\subproblem{3.d}
+Do women who test positive have higher diastolic blood pressures? Is the diastolic blood pressure significant in the regression model? Explain the distinction between the two questions and discuss why the answers are only apparently contradictory.
+
+\solution
+<<p3.d, fig.width=4, fig.height=6, out.width='.5\\linewidth'>>=
+diastolic_pos <- data$diastolic[data$test == 1]
+diastolic_neg <- data$diastolic[data$test == 0]
+boxplot(diastolic_pos, diastolic_neg, 
+        names = c("Positive", "Negative"), 
+        main = "Boxplot of Diastolic")
+
+t.test(diastolic_pos, diastolic_neg, alternative = "greater")
+@
+
+First we draw a box-plot of \m{diastolic} blood pressures for women with different \m{test} result. Here we see that the the average diastolic level of women who tested positive only slightly higher than those who tested negative. Then we run t-test to determine whether the mean of \m{diastolic} from women who test positve is significantly greater than those who test negative. The resulting p-value suggests that women who test positive do have higher diastolic blood pressures. 
+
+Then as what we see in the regression model, \m{diastolic} is not significant under $\alpha = 0.05$ level t-test.
+
+Here is the distinction between the two questions:
+\begin{itemize}
+    \item the first question only consider the effect of \m{diastolic} over \m{test} result, where the effect of other predictors are ignored.
+    \item the second question consider the effect of \m{diastolic} over the part of \m{test} that is not explained by other predictors.
+\end{itemize}
+
+In biref, the significance level of \m{diastolic} in the regression model is adjusted by other predictors, but when we talked about the first question, the effect of other predictors is ignored. So that the answers are only apparently contradictory.
+
+\subproblem{3.e}
+Perform diagnostics on the regression model, reporting any potential violations and any suggested improvements to the model.
+
+\solution
+Here we can see that there are some predictors that are not significant enough in the regression model, so that we can apply AIC based stepwise regression on the full model to obtain a best reduced model.
+
+<<p3.e>>=
+m0 <- glm(test ~ 1, data = data, family = binomial)
+m_AIC <- step(m1, scope = list(lower = m0, upper = m1), 
+              trace = FALSE, direction = "both")
+summary(m_AIC)
+@
+
+Note that there are only 5 predictors included in the AIC based reduced model, suggesting that not all variables are necessary in explaining the test result. The reduced model can be interpreted more easily and may achieve better generalization capability.
+
+\subproblem{3.f}
+Predict the outcome for a woman with predictor values 1, 99, 64, 22, 76, 27, 0.25, 25 (same order as in the dataset). Give a confidence interval for your prediction.
+
+\solution
+<<p3.f>>=
+newx <- data[1, -ncol(data)]
+newx[1, ] <- c(1, 99, 64, 22, 76, 27, 0.25, 25)
+foo <- predict(m_AIC, newdata = newx, se.fit = TRUE)
+ConfInterval <- ilogit(c(foo$fit - 1.96 * foo$se.fit, 
+                         foo$fit + 1.96 * foo$se.fit))
+ConfInterval
+@
+
+Here we see the confidence interval for the prediction of the probability that the new women will be tested as positive is $(\Sexpr{ConfInterval})$, and it should be predicted as negative.
+
+
+\end{document}
