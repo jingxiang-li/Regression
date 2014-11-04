@@ -82,7 +82,7 @@
 \newcommand{\m}[1]{\texttt{{#1}}}
 \newcommand{\E}[0]{\mathrm{E}}
 \newcommand{\Var}[0]{\mathrm{Var}}
-
+\newcommand{\Cov}[0]{\mathrm{Cov}}
 
 
 
