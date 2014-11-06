@@ -124,7 +124,7 @@ summary(m1)
 
 Here we see that the resulting Residual Deviance is \Sexpr{m1$deviance} with \Sexpr{m1$df.residual} degrees of freedom. 
 
-However we can't use this information to determine if this model is an adequate fit, because in this problem $n_{i} = 1, \forall i$ so that the Deviance does not converge to any distribution. Hence we can't determine if this model fits the data by only using the Residual Deviance and the corresponding degrees of freedom.
+It's hard to determine if this model is an adequate fit, because in this problem $n_{i} = 1,~\forall i$ so that the Deviance does not converge to any distribution. However, compared with the degrees of freedom, the resulting residual deviance is vary low, which might suggests that the model is not bad.
 
 \subproblem{2.b}
 Use AIC as the criterion to determine the best subset of variables. (Use the step function.)
@@ -156,7 +156,7 @@ Note that the confidence interval of prediction for the probability that the new
 
 \subproblem{2.d}
 Suppose that a cancer is classified as benign if $p>0.5$ and malignant if $p<0.5$. Compute the number of errors of both types that will be made if this method is applied to the current data with the reduced model.
-
+\clearpage
 \solution
 <<p2.d>>=
 cutoff <- 0.5
@@ -270,15 +270,17 @@ m1 <- glm(test ~ ., data = data, family = binomial)
 summary(m1)
 @
 
-Here we fit the full model \m{m1}. 
+Here we fit the full model \m{m1} with residual deviance \Sexpr{m1$deviance} on \Sexpr{m1$df.residual} degrees of freedom
 
-It's hard to tell whether this model fits the data or not because in this problem $n_{i} = 1,~ \forall i$, so that the deviance doesn't converge to any distribution, hence we don't have an available statistical test for it.
+It's hard to tell whether this model fits the data or not because in this problem $n_{i} = 1,~ \forall i$, so that the deviance doesn't converge to any distribution, hence we don't have an available statistical test for it. However, compared with the degrees of freedom, the residual deviance is relatively lower, which might suggests that this model is not bad.
 
 \subproblem{3.c}
 What is the difference in the odds of testing positive for diabetes for a woman with a BMI at the first quartile compared with a woman at the third quartile, assuming that all other factors are held constant? Give a confidence interval for this difference.
 
 \solution
-Note that the estimated coefficient for \m{bmi} is \Sexpr{m1$coef["bmi"]}, suggesting that a unit increase in \m{bmi} with all other predictors held fixed increases the odds of testing positive for diabetes by 9.89\% in average. Since the difference between the third quartile and the first quartile of \m{bmi} is 9.1, the odds of testing positive for diabetes for a woman with a BMI at the third quartile will be 2.358848 times over a woman at first quartile in average, with all other predictors held fixed.
+Note that the estimated coefficient for \m{bmi} is \Sexpr{round(m1$coef["bmi"],3)}, suggesting that a unit increase in \m{bmi} with all other predictors held fixed increases the \textbf{log-odd} of testing positive for diabetes by \Sexpr{round(m1$coef["bmi"],3)} in average. 
+
+Since the difference between the third quartile and the first quartile of \m{bmi} is $9.1$, the \textbf{log-odd} of testing positive for diabetes for a woman with a BMI at the third quartile will be larger than a woman at first quartile by $9.1 * \Sexpr{round(m1$coef["bmi"],3)} = 0.858$ in average, with all other predictors held fixed. Since the standard deviation of \m{bmi} is 0.0169, then a reasonable 95\% confidence interval for the difference in \textbf{log-odd} should be $(0.556, ~1.160)$
 
 \subproblem{3.d}
 Do women who test positive have higher diastolic blood pressures? Is the diastolic blood pressure significant in the regression model? Explain the distinction between the two questions and discuss why the answers are only apparently contradictory.
@@ -294,7 +296,7 @@ boxplot(diastolic_pos, diastolic_neg,
 t.test(diastolic_pos, diastolic_neg, alternative = "greater")
 @
 
-First we draw a box-plot of \m{diastolic} blood pressures for women with different \m{test} result. Here we see that the the average diastolic level of women who tested positive only slightly higher than those who tested negative. Then we run t-test to determine whether the mean of \m{diastolic} from women who test positve is significantly greater than those who test negative. The resulting p-value suggests that women who test positive do have higher diastolic blood pressures. 
+First we draw a box-plot of \m{diastolic} blood pressures for women with different \m{test} result. Here we see that the the average diastolic level of women who tested positive only slightly higher than those who tested negative. Then we run t-test to determine whether the mean of \m{diastolic} from women who test positive is significantly greater than those who test negative. The resulting p-value suggests that women who test positive do have higher diastolic blood pressures. 
 
 Then as what we see in the regression model, \m{diastolic} is not significant under $\alpha = 0.05$ level t-test.
 
@@ -304,15 +306,24 @@ Here is the distinction between the two questions:
     \item the second question consider the effect of \m{diastolic} over the part of \m{test} that is not explained by other predictors.
 \end{itemize}
 
-In biref, the significance level of \m{diastolic} in the regression model is adjusted by other predictors, but when we talked about the first question, the effect of other predictors is ignored. So that the answers are only apparently contradictory.
+In brief, the significance level of \m{diastolic} in the regression model is adjusted by other predictors, but when we talked about the first question, the effect of other predictors is ignored. So that the answers are only apparently contradictory.
 
 \subproblem{3.e}
 Perform diagnostics on the regression model, reporting any potential violations and any suggested improvements to the model.
 
 \solution
-Here we can see that there are some predictors that are not significant enough in the regression model, so that we can apply AIC based stepwise regression on the full model to obtain a best reduced model.
+First Let's check whether there are outliers included in the training dataset by using half-normal plot as follows:
+<<p3.ep, fig.width=6, fig.height=6, out.width='.7\\linewidth'>>=
+halfnorm(residuals(m1), main = "Half-normal plot for m1")
+@
+
+The half-normal plot suggests that the case 216 and 584 are outliers, hence we will remove them from the dataset.
+
+More than that, here we can see that there are some predictors that are not significant enough in the regression model, so that we can apply AIC based stepwise regression on the full model to obtain a best reduced model.
 
 <<p3.e>>=
+data <- data[-c(216,584), ] ##Remove Outliers
+m1 <- glm(test ~ ., data = data, family = binomial)
 m0 <- glm(test ~ 1, data = data, family = binomial)
 m_AIC <- step(m1, scope = list(lower = m0, upper = m1), 
               trace = FALSE, direction = "both")

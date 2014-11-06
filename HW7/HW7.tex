@@ -200,7 +200,7 @@ Fit a binomial regression with Class as the response and the other nine variable
 
 Here we see that the resulting Residual Deviance is 89.464195 with 671 degrees of freedom. 
 
-However we can't use this information to determine if this model is an adequate fit, because in this problem $n_{i} = 1, \forall i$ so that the Deviance does not converge to any distribution. Hence we can't determine if this model fits the data by only using the Residual Deviance and the corresponding degrees of freedom.
+It's hard to determine if this model is an adequate fit, because in this problem $n_{i} = 1,~\forall i$ so that the Deviance does not converge to any distribution. However, compared with the degrees of freedom, the resulting residual deviance is vary low, which might suggests that the model is not bad.
 
 \subproblem{2.b}
 Use AIC as the criterion to determine the best subset of variables. (Use the step function.)
@@ -275,7 +275,7 @@ Note that the confidence interval of prediction for the probability that the new
 
 \subproblem{2.d}
 Suppose that a cancer is classified as benign if $p>0.5$ and malignant if $p<0.5$. Compute the number of errors of both types that will be made if this method is applied to the current data with the reduced model.
-
+\clearpage
 \solution
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
@@ -526,15 +526,17 @@ Fit a model with the result of the diabetes test as the response and all the oth
 \end{kframe}
 \end{knitrout}
 
-Here we fit the full model \m{m1}. 
+Here we fit the full model \m{m1} with residual deviance 671.1337505 on 715 degrees of freedom
 
-It's hard to tell whether this model fits the data or not because in this problem $n_{i} = 1,~ \forall i$, so that the deviance doesn't converge to any distribution, hence we don't have an available statistical test for it.
+It's hard to tell whether this model fits the data or not because in this problem $n_{i} = 1,~ \forall i$, so that the deviance doesn't converge to any distribution, hence we don't have an available statistical test for it. However, compared with the degrees of freedom, the residual deviance is relatively lower, which might suggests that this model is not bad.
 
 \subproblem{3.c}
 What is the difference in the odds of testing positive for diabetes for a woman with a BMI at the first quartile compared with a woman at the third quartile, assuming that all other factors are held constant? Give a confidence interval for this difference.
 
 \solution
-Note that the estimated coefficient for \m{bmi} is 0.0943048, suggesting that a unit increase in \m{bmi} with all other predictors held fixed increases the odds of testing positive for diabetes by 9.89\% in average. Since the difference between the third quartile and the first quartile of \m{bmi} is 9.1, the odds of testing positive for diabetes for a woman with a BMI at the third quartile will be 2.358848 times over a woman at first quartile in average, with all other predictors held fixed.
+Note that the estimated coefficient for \m{bmi} is 0.094, suggesting that a unit increase in \m{bmi} with all other predictors held fixed increases the \textbf{log-odd} of testing positive for diabetes by 0.094 in average. 
+
+Since the difference between the third quartile and the first quartile of \m{bmi} is $9.1$, the \textbf{log-odd} of testing positive for diabetes for a woman with a BMI at the third quartile will be larger than a woman at first quartile by $9.1 * 0.094 = 0.858$ in average, with all other predictors held fixed. Since the standard deviation of \m{bmi} is 0.0169, then a reasonable 95\% confidence interval for the difference in \textbf{log-odd} should be $(0.556, ~1.160)$
 
 \subproblem{3.d}
 Do women who test positive have higher diastolic blood pressures? Is the diastolic blood pressure significant in the regression model? Explain the distinction between the two questions and discuss why the answers are only apparently contradictory.
@@ -574,7 +576,7 @@ Do women who test positive have higher diastolic blood pressures? Is the diastol
 
 \end{knitrout}
 
-First we draw a box-plot of \m{diastolic} blood pressures for women with different \m{test} result. Here we see that the the average diastolic level of women who tested positive only slightly higher than those who tested negative. Then we run t-test to determine whether the mean of \m{diastolic} from women who test positve is significantly greater than those who test negative. The resulting p-value suggests that women who test positive do have higher diastolic blood pressures. 
+First we draw a box-plot of \m{diastolic} blood pressures for women with different \m{test} result. Here we see that the the average diastolic level of women who tested positive only slightly higher than those who tested negative. Then we run t-test to determine whether the mean of \m{diastolic} from women who test positive is significantly greater than those who test negative. The resulting p-value suggests that women who test positive do have higher diastolic blood pressures. 
 
 Then as what we see in the regression model, \m{diastolic} is not significant under $\alpha = 0.05$ level t-test.
 
@@ -584,17 +586,37 @@ Here is the distinction between the two questions:
     \item the second question consider the effect of \m{diastolic} over the part of \m{test} that is not explained by other predictors.
 \end{itemize}
 
-In biref, the significance level of \m{diastolic} in the regression model is adjusted by other predictors, but when we talked about the first question, the effect of other predictors is ignored. So that the answers are only apparently contradictory.
+In brief, the significance level of \m{diastolic} in the regression model is adjusted by other predictors, but when we talked about the first question, the effect of other predictors is ignored. So that the answers are only apparently contradictory.
 
 \subproblem{3.e}
 Perform diagnostics on the regression model, reporting any potential violations and any suggested improvements to the model.
 
 \solution
-Here we can see that there are some predictors that are not significant enough in the regression model, so that we can apply AIC based stepwise regression on the full model to obtain a best reduced model.
+First Let's check whether there are outliers included in the training dataset by using half-normal plot as follows:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{halfnorm}\hlstd{(}\hlkwd{residuals}\hlstd{(m1),} \hlkwc{main} \hlstd{=} \hlstr{"Half-normal plot for m1"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+
+{\centering \includegraphics[width=.7\linewidth]{figure/p3_ep-1} 
+
+}
+
+
+
+\end{knitrout}
+
+The half-normal plot suggests that the case 216 and 584 are outliers, hence we will remove them from the dataset.
+
+More than that, here we can see that there are some predictors that are not significant enough in the regression model, so that we can apply AIC based stepwise regression on the full model to obtain a best reduced model.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlstd{data} \hlkwb{<-} \hlstd{data[}\hlopt{-}\hlkwd{c}\hlstd{(}\hlnum{216}\hlstd{,}\hlnum{584}\hlstd{), ]} \hlcom{##Remove Outliers}
+\hlstd{m1} \hlkwb{<-} \hlkwd{glm}\hlstd{(test} \hlopt{~} \hlstd{.,} \hlkwc{data} \hlstd{= data,} \hlkwc{family} \hlstd{= binomial)}
 \hlstd{m0} \hlkwb{<-} \hlkwd{glm}\hlstd{(test} \hlopt{~} \hlnum{1}\hlstd{,} \hlkwc{data} \hlstd{= data,} \hlkwc{family} \hlstd{= binomial)}
 \hlstd{m_AIC} \hlkwb{<-} \hlkwd{step}\hlstd{(m1,} \hlkwc{scope} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{lower} \hlstd{= m0,} \hlkwc{upper} \hlstd{= m1),}
               \hlkwc{trace} \hlstd{=} \hlnum{FALSE}\hlstd{,} \hlkwc{direction} \hlstd{=} \hlstr{"both"}\hlstd{)}
@@ -608,24 +630,24 @@ Here we can see that there are some predictors that are not significant enough i
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -2.7894  -0.7138  -0.4023   0.7152   2.4561  
+## -2.4771  -0.7018  -0.3901   0.6795   2.5106  
 ## 
 ## Coefficients:
-##              Estimate Std. Error z value Pr(>|z|)    
-## (Intercept) -9.313824   0.753602 -12.359  < 2e-16 ***
-## pregnant     0.116028   0.033284   3.486  0.00049 ***
-## glucose      0.034783   0.003566   9.753  < 2e-16 ***
-## bmi          0.086147   0.015035   5.730    1e-08 ***
-## diabetes     0.969342   0.305185   3.176  0.00149 ** 
-## age          0.014446   0.009500   1.521  0.12838    
+##             Estimate Std. Error z value Pr(>|z|)    
+## (Intercept) -9.73096    0.78020 -12.472  < 2e-16 ***
+## pregnant     0.12044    0.03384   3.559 0.000372 ***
+## glucose      0.03656    0.00367   9.963  < 2e-16 ***
+## bmi          0.08821    0.01527   5.776 7.63e-09 ***
+## diabetes     1.24331    0.31465   3.951 7.77e-05 ***
+## age          0.01413    0.00963   1.467 0.142418    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 931.94  on 723  degrees of freedom
-## Residual deviance: 673.93  on 718  degrees of freedom
-## AIC: 685.93
+##     Null deviance: 930.25  on 721  degrees of freedom
+## Residual deviance: 658.41  on 716  degrees of freedom
+## AIC: 670.41
 ## 
 ## Number of Fisher Scoring iterations: 5
 \end{verbatim}
@@ -649,13 +671,13 @@ Predict the outcome for a woman with predictor values 1, 99, 64, 22, 76, 27, 0.2
 \hlstd{ConfInterval}
 \end{alltt}
 \begin{verbatim}
-##          1          1 
-## 0.03738038 0.08309098
+##         1         1 
+## 0.0327988 0.0753943
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
 
-Here we see the confidence interval for the prediction of the probability that the new women will be tested as positive is $(0.0373804, 0.083091)$, and it should be predicted as negative.
+Here we see the confidence interval for the prediction of the probability that the new women will be tested as positive is $(0.0327988, 0.0753943)$, and it should be predicted as negative.
 
 
 \end{document}
