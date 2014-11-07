@@ -1,0 +1,262 @@
+%!TEX program = xelatex
+%# -*- coding: utf-8 -*-
+%!TEX encoding = UTF-8 Unicode
+
+\documentclass[12pt,oneside,a4paper]{article}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2cm,bmargin=2cm,lmargin=2cm,rmargin=2cm}
+\usepackage[pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=2,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\hypersetup{pdfstartview={XYZ null null 1}}
+\usepackage{url}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{microtype}
+
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage[retainorgcmds]{IEEEtrantools}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}} 
+\renewcommand{\algorithmicensure}{\textbf{Output:}} 
+ 
+\usepackage[sc]{mathpazo}
+\linespread{1.1}
+\usepackage[T1]{fontenc}
+
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage[figure]{hypcap}
+\usepackage[hypcap]{caption}
+\usepackage{tikz}
+%\usepackage{grffile} 
+%\usepackage{float} 
+\usepackage{pdfpages}
+
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+
+%\usepackage[square,numbers,super,comma,sort]{natbib}
+%\usepackage[backend=biber, style=nature, sorting=none, isbn=false, url=false, doi=false]{biblatex}
+%\addbibresource{ref.bib}
+%\usepackage[]{authblk}
+
+\usepackage{verbatim}
+
+\newcommand{\problem}[1]
+{
+    \clearpage
+    \section*{Problem {#1}}
+}
+
+\newcommand{\subproblem}[1]
+{
+    \subsection*{Problem {#1}}
+}
+
+
+\newcommand{\solution}
+{
+    \vspace{15pt}
+    \noindent\ignorespaces\textbf{\large Solution}\par
+}
+
+\usepackage{fancyhdr}
+\usepackage{extramarks}
+\lhead{\hmwkAuthorName}
+\chead{\hmwkTitle}
+\rhead{\firstxmark}
+\cfoot{\thepage}
+
+\newcommand{\hmwkTitle}{STAT 8051 HW 8}
+\newcommand{\hmwkAuthorName}{Jingxiang Li}
+
+\setlength\headheight{15pt}
+\setlength\parindent{0pt}
+\setlength{\parskip}{0.5em}
+
+\newcommand{\m}[1]{\texttt{{#1}}}
+\newcommand{\E}[0]{\mathrm{E}}
+\newcommand{\Var}[0]{\mathrm{Var}}
+\newcommand{\Cov}[0]{\mathrm{Cov}}
+
+
+
+\pagestyle{fancy}
+
+\title{\hmwkTitle}
+\author{\hmwkAuthorName}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+<<setup, include=FALSE, cache=FALSE>>=
+# set global chunk options
+opts_chunk$set(fig.path='figure/', fig.align='center', fig.show='hold', tidy=FALSE, tidy.opts=list(keep.blank.line=TRUE, width.cutoff=50), warning=FALSE, error=FALSE, message=FALSE, echo=TRUE)
+#, sanitize=TRUE, dev="tikz")
+options(replace.assign=TRUE,width=90)
+knit_theme$set("edit-eclipse")
+knit_hooks$set(document = function(x) { 
+  sub('\\usepackage[]{color}', '\\usepackage[]{xcolor}', x, fixed = TRUE) 
+}) 
+@
+
+\problem{1}
+The dataset discoveries lists the numbers of ``great'' inventions and scientific discoveries in each year from 1860 to 1959. Has the discovery rate remained constant over time?
+
+\solution
+To test whether the discovery rate remained constant over time, we decide to use Pearson's chi-squared test to evaluate how likely it is that any observed difference arose by chance. However, the number of ``great'' inventions for each year is very small, thus we can't directly apply Pearson's chi-squared test to the original dataset, we have to combine some observations and let each ``combined observation'' have higher frequency value.  
+
+\begin{table}[ht!]
+\centering
+\caption{Combined Data}
+\begin{tabular}{cc}
+\toprule
+ \multicolumn{1}{c}{ Observation } & \multicolumn{1}{c}{ Expectation } \\
+\midrule
+ $18$ & $24.8$ \\
+ $16$ & $21.7$ \\
+ $17$ & $15.5$ \\
+ $16$ & $15.5$ \\
+ $25$ & $9.3$ \\
+ $21$ & $12.4$ \\
+ $21$ & $15.5$ \\
+ $16$ & $15.5$ \\
+ $17$ & $18.6$ \\
+ $19$ & $15.5$ \\
+ $17$ & $9.3$ \\
+ $17$ & $18.6$ \\
+ $17$ & $12.4$ \\
+ $20$ & $15.5$ \\
+ $16$ & $24.8$ \\
+ $18$ & $27.9$ \\
+ $16$ & $21.7$ \\
+ $3$ & $15.5$ \\
+\bottomrule
+\end{tabular}
+\label{tab:combinedData}
+\end{table}
+
+Table \ref{tab:combinedData} is the combined data. Then, we are going to apply Pearson's chi-squared test to the combined dataset and see whether the discovery rate remained constant over time.
+\clearpage
+<<p1>>=
+require(faraway)
+require(MASS)
+
+data <- discoveries
+E_x <- sum(data) / length(data) ## Expectation under constant discovery rate
+
+## build up the combined data
+k = 1
+x = vector(mode = "numeric", length = length(data))
+y = x
+for (i in 1:length(data))
+{
+    x[k] <- x[k] + data[i]
+    y[k] <- y[k] + 1
+    
+    if (x[k] > 15)
+    {
+        k <- k + 1
+    }
+}
+
+n <- sum(x > 0)
+x <- x[1 : n] ## Observation for combined data
+y <- y[1 : n]
+EE_x <- y * E_x ## Expectation for combined data
+
+## Apply Pearson's chi-squared test to the combined data
+chisq.test(x = x, p = EE_x, rescale.p = TRUE)
+@
+
+here we see the resulting p-value is $8.146\textrm{e}-08$, which suggests that the discovery rate did not remain constant over time.
+
+\problem{2}
+The salmonella data was collected in a salmonella reverse mutagenicity assay. The predictor is the dose level of quinoline and the response is the numbers of revertant colonies of TA98 salmonella observed on each of three replicate plates. Show that a Poisson GLM is inadequate and that some overdispersion must be allowed for. Do not forget to check out other reasons for a high deviance.
+
+\solution
+<<p2.1, fig.width=8, fig.height=5, out.width='1\\linewidth'>>=
+data <- salmonella
+m1 <- glm(colonies ~ dose, family = poisson, data = data)
+summary(m1)
+
+par(mfrow = c(1, 2))
+halfnorm(residuals(m1), main = "Half-normal Plot")
+plot(log(fitted(m1)), log((data$colonies - fitted(m1))^2),
+     xlab = expression(hat(mu)), ylab = expression((y - hat(mu))^2), 
+     main = "Variance VS. Mean")
+abline(0, 1)
+@
+
+Here we see the resulting residual deviance is \Sexpr{round(m1$deviance,2)} with \Sexpr{round(m1$df.residual,2)} degrees of freedom which indicates an ill-fitting model if the Poisson is the correct model for the response. First we check outliers for the model by Half-normal plot. In the plot above we see that case 12 is vary likely to be an outlier, so we remove it and rebuild the Poisson regression.
+
+<<p2.2, fig.width=8, fig.height=5, out.width='1\\linewidth'>>=
+data1 <- data[-12, ]
+m1 <- update(m1, data = data1)
+summary(m1)
+
+par(mfrow = c(1, 2))
+halfnorm(residuals(m1), main = "Half-normal Plot")
+plot(log(fitted(m1)), log((data1$colonies - fitted(m1))^2),
+     xlab = expression(hat(mu)), ylab = expression((y - hat(mu))^2), 
+     main = "Variance VS. Mean")
+abline(0, 1)
+@
+
+After removing case 12 from the dataset, the resulting residual deviance is \Sexpr{round(m1$deviance,2)} with \Sexpr{round(m1$df.residual,2)} degrees of freedom which still indicates an ill-fitting model if the Poisson is the correct model for the response. Then we check the "Variance vs Mean" plot, we see that the estimated variance is larger than the corresponding mean, suggesting that over-dispersion exists in this model. So that we can correct the model by calculating the dispersion parameter, and then summarize the model under the dispersion parameter.
+
+<<p2.3>>=
+dp <- sum(residuals(m1, type = "pearson") ^ 2) / m1$df.res
+summary(m1, dispersion = dp)
+drop1(m1, test = "F")
+@
+
+\problem{7}
+The dataset esdcomp was recorded on 44 doctors working in an emergency service at a hospital to study the factors affecting the number of complaints received. Build a model for the number of complaints received and write a report on your conclusions.
+
+\solution
+<<p7, fig.width=8, fig.height=5, out.width='1\\linewidth'>>=
+data <- esdcomp
+m1 <- glm(complaints ~ ., family = poisson, data = data)
+summary(m1)
+drop1(m1,test = "F")
+
+par(mfrow = c(1, 2))
+halfnorm(residuals(m1), main = "Half-normal Plot")
+plot(log(fitted(m1)), log((data$complaints - fitted(m1))^2),
+     xlab = expression(hat(mu)), ylab = expression((y - hat(mu))^2), 
+     main = "Variance VS. Mean")
+abline(0,1)
+@
+
+First we try to build a Poisson regression model to explain the number of complaints received. The resulting residual deviance is \Sexpr{round(m1$deviance,2)} on \Sexpr{round(m1$df.residual, 2)} degrees of freedom, suggesting that this is an ill-fitting model. Then we draw Half-normal plot to check outliers. However, the Half-normal plot doesn't suggest strong evidence of the existence of outliers. We conclude that maybe the model itself has some problem, so before adding interactions or polynomial terms, we determine to try negative-binomial model as follows.
+
+<<p7.1>>=
+m_nb1 <- glm.nb(complaints ~ ., data = data)
+summary(m_nb1)
+drop1(m_nb1)
+@
+
+Here we see for the negative-binomial model, the resulting residual deviance is \Sexpr{round(m_nb1$deviance,2)} on \Sexpr{round(m_nb1$df.residual, 2)} degrees of freedom, which improves a lot compared with the Poisson regression model. Then, from the anova analysis above we see that there are some coefficients that are not significant enough, so that the full model might be redundant. Hence we can try to remove some insignificant predictors in terms of AIC.
+
+<<p7.2>>=
+m_nb0 <- glm.nb(complaints ~ 1, data = data)
+m_AIC <- step(m_nb1, scope = list(upper = m_nb1, lower = m_nb0), 
+              trace = FALSE, direction = "both")
+summary(m_AIC)
+drop1(m_AIC)
+@
+
+Here we see the reduced model in terms of AIC has residual deviance \Sexpr{round(m_AIC$deviance,2)} on \Sexpr{round(m_AIC$df.residual, 2)} degrees of freedom, which further improves the previous model in terms of the interpretability. 
+
+The positive coefficient of \m{visits} suggests that the more a patient visits doctors, the more complaints will be made by the patient. Note that the coefficient for \m{residencyY} is negative, which indicates that doctors who have experience in the residency training are more likely to have less complaints from the patients.
+
+
+\end{document}
