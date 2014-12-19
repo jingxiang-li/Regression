@@ -1,0 +1,19 @@
+"x" "V1" "apply(foo, 1, mean)" "apply(foo, 1, sd)"
+"1" "m1" "simple linear model" 0.800943396226415 0.0201252689440326
+"2" "m2" "stepwise linear model aic" 0.806918238993711 0.0274599851596182
+"3" "m3" "stepwise linear model bic" 0.824528301886792 0.0247315861716182
+"4" "m4" "lasso (glmnet)" 0.823270440251572 0.0265189239475808
+"5" "m5" "lasso (glmnet)" 0.822327044025157 0.0216790354079245
+"6" "m6" "elastic net (glmnet)" 0.824528301886792 0.0217772448992998
+"7" "m7" "multivariate adaptive regression splines" 0.774842767295598 0.026495362038044
+"8" "m8" "random forest" 0.811635220125786 0.0215441722924978
+"9" "m9" "gradient boosting tree" 0.811949685534591 0.0188016047289746
+"10" "m10" "gaussian process with linear kernal" 0.806918238993711 0.0217006316630635
+"11" "m11" "gaussian process with polynomial kernel" 0.818238993710692 0.0262030231690343
+"12" "m12" "k nearest neighbors" 0.774213836477987 0.0249828447673526
+"13" "m13" "support vector machines with linear kernel" 0.820754716981132 0.0215465879646804
+"14" "m14" "support vector machines with polynomial kernel" 0.822012578616352 0.0206183517330862
+"15" "m15" "support vector machines with radial basis function kernel" 0.822955974842767 0.0242534615182333
+"16" "m16" "boosting c5.0" 0.79811320754717 0.0214885368812912
+"17" "m17" "linear discriminant analysis" 0.814465408805031 0.019730899226516
+"18" "m18" "quadratic discriminant analysis" 0.710691823899371 0.0192502368070821

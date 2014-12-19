@@ -1,0 +1,18 @@
+"No." "Model" "RMSE.mean" "RMSE.se"
+"1" "m1" " linear regression model" 2.02750806094298 0.147034118935908
+"2" "m2" " stepwise linear regression model AIC" 1.98815879417599 0.154610638882628
+"3" "m3" " stepwise linear regression model BIC" 1.94720798259983 0.150330891224603
+"4" "m4" " lars" 1.93746785374931 0.160570084522119
+"5" "m5" " lasso (glmnet)" 1.93644481751159 0.157660762531081
+"6" "m6" " ridge (glmnet)" 2.09200694707176 0.172758032877276
+"7" "m7" " elastic net (glmnet)" 1.93440853020884 0.156471829676598
+"8" "m8" " multivariate adaptive regression splines (earth)" 1.12610222609023 0.0649861277899113
+"9" "m9" " random forest" 3.45950708906772 0.300262147754779
+"10" "m10" " gradient boosting tree" 2.26366655630792 0.159052992009362
+"11" "m11" " gaussian process with linear kernal" 2.02483084611953 0.148459709182949
+"12" "m12" " gaussian process with polynomial kernel" 1.94823933841145 0.206558362721136
+"13" "m13" " k nearest neighbor" 7.38509994382537 0.32895387852239
+"14" "m14" " partial least regression" 2.02911108726533 0.146669811920143
+"15" "m15" " projection pursuit regression" 1.99542259432017 0.154253896457831
+"16" "m16" " relevance vector machines with linear kernel" 2.04330142063986 0.146169515949606
+"17" "m17" " relevance vector machines with polynomial kernel" 1.81890175642225 0.149517523962515

@@ -1,32 +1,23 @@
-RF <- function(X, y, family = "gaussian")
+require(randomForest)
+
+RF <- function(X, y, X_test, y_test, family = "gaussian")
 {
+    result <- list(prediction = NULL, error = NULL, model = NULL)
     data <- data.frame(X, y)
     if (family == "gaussian")
     {
-        result <- c()
-        n1 <- floor(ncol(X) / 3)
-        n2 <- floor(ncol(X) / 3 * 2)
-        for (i in n1:n2)
-        {
-            m <- randomForest(y ~ ., data = data, mtry = i, ntree = 300)
-            result[i - n1 + 1] <- min(m$mse)
-        }
-        mtry_opt <- order(result)[1] + n1 - 1
-        m <- randomForest(y ~ ., data = data, mtry = mtry_opt, ntree = 300)
-        m
+        m <- randomForest(y ~ ., data = data, ntree = 400)
+        result$model <- m
+        result$prediction <- predict(m, X_test)
+        result$error <- mean((result$prediction - y_test)^2)
     }
     else
     {
-        result <- c()
-        n1 <- floor(sqrt(ncol(X)))
-        n2 <- floor(sqrt(ncol(X)) * 4)
-        for (i in n1:n2)
-        {
-            m <- randomForest(as.factor(y) ~ ., data = data, mtry = i, ntree = 300)
-            result[i - n1 + 1] <- min(m$err.rate[,1])
-        }
-        mtry_opt <- order(result)[1] + n1 - 1
-        m <- randomForest(y ~ ., data = data, mtry = mtry_opt, ntree = 300)
-        m
+        m <- randomForest(as.factor(y) ~ ., data = data, ntree = 400)
+        result$model <- m
+        result$prediction <- predict(m, X_test)
+        tmp <- table(result$prediction, y_test)
+        result$error <- tmp[1,2] + tmp[2,1]
     }
+    result
 }
